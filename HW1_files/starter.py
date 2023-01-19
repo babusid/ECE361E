@@ -5,6 +5,7 @@ import torchvision.transforms as transforms
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - Starter code')
@@ -32,8 +33,7 @@ learning_rate = args.lr
 # we have fixed a random seed to a specific value such that we "control" the randomness.
 random_seed = 1
 torch.manual_seed(random_seed)
-# device = torch.device('cuda')
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # MNIST Dataset (Images and Labels)
 train_dataset = dsets.MNIST(root='data', train=True, transform=transforms.ToTensor(), download=True)
@@ -76,6 +76,7 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
+    start = time.time()
     for train_batch_idx, (images, labels) in enumerate(train_loader):
         # Here we vectorize the 28*28 images as several 784-dimensional inputs
         images = images.to(device)
@@ -104,6 +105,8 @@ for epoch in range(num_epochs):
         #                                                                      train_loss / (train_batch_idx + 1),
         #                                                                      100. * train_correct / train_total))
     # Testing phase
+    end = time.time()
+    train_time = end-start
     test_correct = 0
     test_total = 0
     test_loss = 0
@@ -111,6 +114,7 @@ for epoch in range(num_epochs):
     model = model.eval()
     # Disabling gradient calculation is useful for inference.
     # It will reduce memory consumption for computations.
+    start = time.time()
     with torch.no_grad():
         for test_batch_idx, (images, labels) in enumerate(test_loader):
             images = images.to(device)
@@ -127,10 +131,12 @@ for epoch in range(num_epochs):
             _, predicted = torch.max(outputs.data, 1)
             test_total += labels.size(0)
             test_correct += predicted.eq(labels).sum().item()
-    
+    end = time.time()
+    inference_time = end-start
     print('Epoch: %.0f'%(epoch+1))
     print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
-    print('Test accuracy: %.2f %% Test loss: %.4f\n' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+    print('Train time: %.2f s, Total Inference time: %.2f s, Average Inference Time: %.6f s\n' % (train_time, inference_time, (inference_time/test_total)))
     epochs.append(epoch+1)
     trainloss.append(train_loss / (train_batch_idx+1))
     testloss.append(test_loss / (test_batch_idx + 1))
@@ -143,7 +149,7 @@ plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
 plt.xlabel('epochs')
 plt.ylabel('loss')
 plt.legend()
-plt.savefig('lossplot_1_2.png')
+plt.savefig('starter/lossplot_1_2.png')
 plt.clf()
 
 plt.scatter(epochs,trainacc, label="Training Accuracy")
@@ -152,5 +158,5 @@ plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
-plt.savefig('accplot_1_2.png')
+plt.savefig('starter/accplot_1_2.png')
 plt.clf()

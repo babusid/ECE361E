@@ -4,6 +4,9 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import torch.nn.functional as F
 import argparse
+import matplotlib.pyplot as plt
+import numpy as np
+import time
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleFC')
@@ -31,8 +34,7 @@ learning_rate = args.lr
 # we have fixed a random seed to a specific value such that we "control" the randomness.
 random_seed = 1
 torch.manual_seed(random_seed)
-# device = torch.device('cuda')
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # MNIST Dataset (Images and Labels)
 train_dataset = dsets.MNIST(root='data', train=True, transform=transforms.ToTensor(), download=True)
@@ -69,6 +71,11 @@ criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
 # Training loop
+epochs = []
+trainloss = []
+testloss = []
+trainacc = []
+testacc = []
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -76,7 +83,7 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
-    for batch_idx, (images, labels) in enumerate(train_loader):
+    for train_batch_idx, (images, labels) in enumerate(train_loader):
         images = images.to(device)
         labels = labels.to(device)
         # Here we vectorize the 28*28 images as several 784-dimensional inputs
@@ -98,10 +105,10 @@ for epoch in range(num_epochs):
         train_total += labels.size(0)
         train_correct += predicted.eq(labels).sum().item()
         # Print every 100 steps the following information
-        if (batch_idx + 1) % 100 == 0:
-            print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, batch_idx + 1,
+        if (train_batch_idx + 1) % 100 == 0:
+            print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
                                                                              len(train_dataset) // batch_size,
-                                                                             train_loss / (batch_idx + 1),
+                                                                             train_loss / (train_batch_idx + 1),
                                                                              100. * train_correct / train_total))
     # Testing phase
     test_correct = 0
@@ -112,7 +119,7 @@ for epoch in range(num_epochs):
     # Disabling gradient calculation is useful for inference.
     # It will reduce memory consumption for computations.
     with torch.no_grad():
-        for batch_idx, (images, labels) in enumerate(test_loader):
+        for test_batch_idx, (images, labels) in enumerate(test_loader):
             images = images.to(device)
             labels = labels.to(device)
             # Here we vectorize the 28*28 images as several 784-dimensional inputs
@@ -127,4 +134,27 @@ for epoch in range(num_epochs):
             _, predicted = torch.max(outputs.data, 1)
             test_total += labels.size(0)
             test_correct += predicted.eq(labels).sum().item()
-    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (batch_idx + 1)))
+    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+    epochs.append(epoch+1)
+    trainloss.append(train_loss / (train_batch_idx+1))
+    testloss.append(test_loss / (test_batch_idx + 1))
+    trainacc.append(100. * train_correct / train_total)
+    testacc.append(100. * test_correct / test_total)
+
+plt.scatter(epochs,trainloss, label="Training Loss")
+plt.scatter(epochs,testloss, label = "Test Loss")
+plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.legend()
+plt.savefig('simpleFC/lossplot_2_1.png')
+plt.clf()
+
+plt.scatter(epochs,trainacc, label="Training Accuracy")
+plt.scatter(epochs,testacc, label="Testing Accuracy")
+plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.legend()
+plt.savefig('simpleFC/accplot_2_1.png')
+plt.clf()
