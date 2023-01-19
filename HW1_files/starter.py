@@ -99,11 +99,11 @@ for epoch in range(num_epochs):
         train_total += labels.size(0)
         train_correct += predicted.eq(labels).sum().item()
         # Print every 100 steps the following information
-        # if (train_batch_idx + 1) % 100 == 0:
-        #     print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
-        #                                                                      len(train_dataset) // batch_size,
-        #                                                                      train_loss / (train_batch_idx + 1),
-        #                                                                      100. * train_correct / train_total))
+        if (train_batch_idx + 1) % 100 == 0:
+            print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
+                                                                             len(train_dataset) // batch_size,
+                                                                             train_loss / (train_batch_idx + 1),
+                                                                             100. * train_correct / train_total))
     # Testing phase
     end = time.time()
     train_time = end-start
@@ -114,7 +114,7 @@ for epoch in range(num_epochs):
     model = model.eval()
     # Disabling gradient calculation is useful for inference.
     # It will reduce memory consumption for computations.
-    start = time.time()
+    inference_time = 0
     with torch.no_grad():
         for test_batch_idx, (images, labels) in enumerate(test_loader):
             images = images.to(device)
@@ -122,7 +122,10 @@ for epoch in range(num_epochs):
             # Here we vectorize the 28*28 images as several 784-dimensional inputs
             images = images.view(-1, input_size)
             # Perform the actual inference
+            start = time.time()
             outputs = model(images)
+            end = time.time()
+            inference_time += end-start
             # Compute the loss
             loss = criterion(outputs, labels)
             test_loss += loss.item()
@@ -131,8 +134,7 @@ for epoch in range(num_epochs):
             _, predicted = torch.max(outputs.data, 1)
             test_total += labels.size(0)
             test_correct += predicted.eq(labels).sum().item()
-    end = time.time()
-    inference_time = end-start
+    
     print('Epoch: %.0f'%(epoch+1))
     print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
     print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))

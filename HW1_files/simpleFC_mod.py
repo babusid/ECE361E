@@ -4,6 +4,9 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import torch.nn.functional as F
 import argparse
+import matplotlib.pyplot as plt
+import time
+import numpy as np
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleFC')
@@ -64,7 +67,9 @@ class SimpleFC(nn.Module):
         out = self.linear4(out)
         return out
 
+
 for dropoutFraction in [0.0,0.2,0.5,0.8]:
+    print("dropoutFraction = ",dropoutFraction)
     model = SimpleFC(input_size, num_classes,dropoutFraction)
     model = model.to(device)
 
@@ -73,14 +78,20 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     # Training loop
+    epochs = []
+    trainloss = []
+    testloss = []
+    trainacc = []
+    testacc = []
     for epoch in range(num_epochs):
         # Training phase
         train_correct = 0
         train_total = 0
         train_loss = 0
         # Sets the model in training mode.
+        start = time.time()
         model = model.train()
-        for batch_idx, (images, labels) in enumerate(train_loader):
+        for train_batch_idx, (images, labels) in enumerate(train_loader):
             images = images.to(device)
             labels = labels.to(device)
             # Here we vectorize the 28*28 images as several 784-dimensional inputs
@@ -102,11 +113,13 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
             train_total += labels.size(0)
             train_correct += predicted.eq(labels).sum().item()
             # Print every 100 steps the following information
-            if (batch_idx + 1) % 100 == 0:
-                print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, batch_idx + 1,
+            if (train_batch_idx + 1) % 100 == 0:
+                print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
                                                                                 len(train_dataset) // batch_size,
-                                                                                train_loss / (batch_idx + 1),
+                                                                                train_loss / (train_batch_idx + 1),
                                                                                 100. * train_correct / train_total))
+        end = time.time()
+        train_time = end - start
         # Testing phase
         test_correct = 0
         test_total = 0
@@ -116,7 +129,7 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
         # Disabling gradient calculation is useful for inference.
         # It will reduce memory consumption for computations.
         with torch.no_grad():
-            for batch_idx, (images, labels) in enumerate(test_loader):
+            for test_batch_idx, (images, labels) in enumerate(test_loader):
                 # Here we vectorize the 28*28 images as several 784-dimensional inputs
                 images = images.view(-1, input_size)
                 # Perform the actual inference
@@ -129,4 +142,113 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
                 _, predicted = torch.max(outputs.data, 1)
                 test_total += labels.size(0)
                 test_correct += predicted.eq(labels).sum().item()
-        print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (batch_idx + 1)))
+        
+        print('Epoch: %.0f'%(epoch+1))
+        print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
+        print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+        print('Train time: %.2f s' % (train_time))
+        epochs.append(epoch+1)
+        trainloss.append(train_loss / (train_batch_idx+1))
+        testloss.append(test_loss / (test_batch_idx + 1))
+        trainacc.append(100. * train_correct / train_total)
+        testacc.append(100. * test_correct / test_total)
+
+    plt.scatter(epochs,trainloss, label="Training Loss")
+    plt.scatter(epochs,testloss, label = "Test Loss")
+    plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+    plt.xlabel('epochs')
+    plt.ylabel('loss')
+    plt.legend()
+    plt.savefig('simpleFC_mod/lossplot_1_2_%.1f.png'%(dropoutFraction))
+    plt.clf()
+
+
+
+for dropoutFraction in [0.0,0.2,0.5,0.8]:
+    print("dropoutFraction = ",dropoutFraction)
+    model = SimpleFC(input_size, num_classes,dropoutFraction)
+    model = model.to(device)
+
+    # Define your loss and optimizer
+    criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+
+    # Training loop
+    epochs = []
+    trainloss = []
+    testloss = []
+    trainacc = []
+    testacc = []
+    for epoch in range(num_epochs):
+        # Training phase
+        train_correct = 0
+        train_total = 0
+        train_loss = 0
+        # Sets the model in training mode.
+        start = time.time()
+        model = model.train()
+        for train_batch_idx, (images, labels) in enumerate(train_loader):
+            images = images.to(device)
+            labels = labels.to(device)
+            # Here we vectorize the 28*28 images as several 784-dimensional inputs
+            images = images.view(-1, input_size)
+            # Sets the gradients to zero
+            optimizer.zero_grad()
+            # The actual inference
+            outputs = model(images)
+            # Compute the loss between the predictions (outputs) and the ground-truth labels
+            loss = criterion(outputs, labels)
+            # Do backpropagation to update the parameters of your model
+            loss.backward()
+            # Performs a single optimization step (parameter update)
+            optimizer.step()
+            train_loss += loss.item()
+            # The outputs are one-hot labels, we need to find the actual predicted
+            # labels which have the highest output confidence
+            _, predicted = outputs.max(1)
+            train_total += labels.size(0)
+            train_correct += predicted.eq(labels).sum().item()
+            # Print every 100 steps the following information
+            if (train_batch_idx + 1) % 100 == 0:
+                print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
+                                                                                len(train_dataset) // batch_size,
+                                                                                train_loss / (train_batch_idx + 1),
+                                                                                100. * train_correct / train_total))
+        end = time.time()
+        train_time = end - start
+        # Testing phase
+        test_correct = 0
+        test_total = 0
+        test_loss = 0
+        # Sets the model in evaluation mode
+        model = model.eval()
+        # Disabling gradient calculation is useful for inference.
+        # It will reduce memory consumption for computations.
+        inference_time = 0
+        with torch.no_grad():
+            for test_batch_idx, (images, labels) in enumerate(test_loader):
+                # Here we vectorize the 28*28 images as several 784-dimensional inputs
+                images = images.view(-1, input_size)
+                # Perform the actual inference
+                start = time.time()
+                outputs = model(images)
+                end = time.time()
+                inference_time += end - start
+                # Compute the loss
+                loss = criterion(outputs, labels)
+                test_loss += loss.item()
+                # The outputs are one-hot labels, we need to find the actual predicted
+                # labels which have the highest output confidence
+                _, predicted = torch.max(outputs.data, 1)
+                test_total += labels.size(0)
+                test_correct += predicted.eq(labels).sum().item()
+
+        print('Epoch: %.0f'%(epoch+1))
+        print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
+        print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+        print('Train time: %.2f s, Inference time: %.2f' % (train_time, inference_time / len(test_loader)))
+        epochs.append(epoch+1)
+        trainloss.append(train_loss / (train_batch_idx+1))
+        testloss.append(test_loss / (test_batch_idx + 1))
+        trainacc.append(100. * train_correct / train_total)
+        testacc.append(100. * test_correct / test_total)
