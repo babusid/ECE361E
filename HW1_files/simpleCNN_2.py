@@ -7,6 +7,8 @@ import argparse
 from torchinfo import summary
 from thop import profile
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleCNN')
@@ -49,6 +51,7 @@ class SimpleCNN(nn.Module):
         super(SimpleCNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.batchnorm2 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
         self.linear1 = nn.Linear(7 * 7 * 64, num_classes)
@@ -56,6 +59,7 @@ class SimpleCNN(nn.Module):
     def forward(self, x):
         out = F.relu(self.conv1(x))
         out = self.pool1(out)
+        out = self.batchnorm2(out)
         out = F.relu(self.conv2(out))
         out = self.pool2(out)
         out = out.view(out.size(0), -1)
@@ -71,6 +75,11 @@ criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
 # Training loop
+epochs = []
+trainloss = []
+testloss = []
+trainacc = []
+testacc = []
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -78,7 +87,7 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
-    for batch_idx, (images, labels) in enumerate(train_loader):
+    for train_batch_idx, (images, labels) in enumerate(train_loader):
         images = images.to(device)
         labels = labels.to(device)
         # Sets the gradients to zero
@@ -98,13 +107,13 @@ for epoch in range(num_epochs):
         train_total += labels.size(0)
         train_correct += predicted.eq(labels).sum().item()
         # Print every 100 steps the following information
-        if (batch_idx + 1) % 100 == 0:
-            print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, batch_idx + 1,
+        if (train_batch_idx + 1) % 100 == 0:
+            print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f Acc: %.2f%%' % (epoch + 1, num_epochs, train_batch_idx + 1,
                                                                              len(train_dataset) // batch_size,
-                                                                             train_loss / (batch_idx + 1),
+                                                                             train_loss / (train_batch_idx + 1),
                                                                              100. * train_correct / train_total))
     # Checkpoint the model
-    torch.save(model.state_dict(), 'simpleCNN/model_saves/model_ckpt_%i.pth'%epoch)
+    torch.save(model.state_dict(), 'simpleCNN_2/model_saves/model_ckpt_%i.pth'%epoch)
 
     # Testing phase
     test_correct = 0
@@ -115,7 +124,7 @@ for epoch in range(num_epochs):
     # Disabling gradient calculation is useful for inference.
     # It will reduce memory consumption for computations.
     with torch.no_grad():
-        for batch_idx, (images, labels) in enumerate(test_loader):
+        for test_batch_idx, (images, labels) in enumerate(test_loader):
             # Perform the actual inference
             outputs = model(images)
             # Compute the loss
@@ -127,16 +136,40 @@ for epoch in range(num_epochs):
             test_total += labels.size(0)
             test_correct += predicted.eq(labels).sum().item()
 
-    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (batch_idx + 1)))
-
+    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+    epochs.append(epoch+1)
+    trainloss.append(train_loss / (train_batch_idx+1))
+    testloss.append(test_loss / (test_batch_idx + 1))
+    trainacc.append(100. * train_correct / train_total)
+    testacc.append(100. * test_correct / test_total)
 
 # Print the model summary
 summary(model, (1,1,28,28))
-size = os.path.getsize('simpleCNN/model_saves/model_ckpt_%i.pth'%(num_epochs-1))
+size = os.path.getsize('simpleCNN_2/model_saves/model_ckpt_%i.pth'%(num_epochs-1))
 size /= 1024
 print("Saved Model size on disk: %i kb"%size)
+
 #Profiling the models operations
 input = torch.randn(1,1,28,28)
 macs, params = profile(model, inputs=(input, ))
 print("MACs: %i"%macs)
 print("FLOPs: %i"%(macs*2))
+
+
+plt.scatter(epochs,trainloss, label="Training Loss")
+plt.scatter(epochs,testloss, label = "Test Loss")
+plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.legend()
+plt.savefig('simpleCNN_2/lossplot_3_2.png')
+plt.clf()
+
+plt.scatter(epochs,trainacc, label="Training Accuracy")
+plt.scatter(epochs,testacc, label="Testing Accuracy")
+plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.legend()
+plt.savefig('simpleCNN_2/accplot_3_2.png')
+plt.clf()
