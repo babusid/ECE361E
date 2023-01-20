@@ -137,7 +137,7 @@ for epoch in range(num_epochs):
     
     print('Epoch: %.0f'%(epoch+1))
     print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
-    print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
+    print('Test accuracy: %.2f %% Test loss: %.4f\n' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
     epochs.append(epoch+1)
     trainloss.append(train_loss / (train_batch_idx+1))
     testloss.append(test_loss / (test_batch_idx + 1))
