@@ -6,6 +6,10 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from multiprocessing import Process
+import sys
+import os
+import subprocess
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - Starter code')
@@ -69,6 +73,14 @@ trainloss = []
 testloss = []
 trainacc = []
 testacc = []
+
+def mcheck():
+    log = open('starter/memcheck.txt', 'a')
+    while True:
+        time.sleep(.1)
+        mem = subprocess.run(['nvidia-smi'],stdout=subprocess.PIPE)
+        log.write(mem.stdout.decode('utf-8'))
+memcheck = Process(target = mcheck)
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -77,6 +89,7 @@ for epoch in range(num_epochs):
     # Sets the model in training mode.
     model = model.train()
     start = time.time()
+    memcheck.start()
     for train_batch_idx, (images, labels) in enumerate(train_loader):
         # Here we vectorize the 28*28 images as several 784-dimensional inputs
         images = images.to(device)
@@ -104,6 +117,7 @@ for epoch in range(num_epochs):
                                                                              len(train_dataset) // batch_size,
                                                                              train_loss / (train_batch_idx + 1),
                                                                              100. * train_correct / train_total))
+    memcheck.terminate()
     # Testing phase
     end = time.time()
     train_time = end-start
