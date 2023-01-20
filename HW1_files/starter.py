@@ -72,9 +72,12 @@ def mcheck():
     log = open('starter/memcheck.txt', 'a')
     while True:
         time.sleep(.1)
-        mem = subprocess.run(['nvidia-smi'],stdout=subprocess.PIPE)
+        try:
+            mem = subprocess.run(['nvidia-smi'],stdout=subprocess.PIPE)
+        except subprocess.SubprocessError:
+            print('Error: nvidia-smi not found')
+            memcheck.kill()
         log.write(mem.stdout.decode('utf-8'))
-memcheck = Process(target = mcheck)
 
 # Training loop
 epochs = []
@@ -90,6 +93,7 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
+    memcheck = Process(target = mcheck)
     memcheck.start() #start memory check
     start = time.time()
     for train_batch_idx, (images, labels) in enumerate(train_loader):
@@ -160,8 +164,8 @@ for epoch in range(num_epochs):
 
 #inference time profiling, Problem 1.3 (Total inference time, Average Inference time)
 inference_time = 0
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=1, shuffle=False)
 with torch.no_grad():
-    test_loader.batch_size = 1
     for infbatch, (images,labels) in enumerate(test_loader):
         images = images.to(device)
         labels = labels.to(device)
@@ -174,9 +178,10 @@ with torch.no_grad():
 
 
 #Print results, Problem 1.3
-print('Train time: %.2f s\n' % (training_time))
+print('Train time: %.2f s' % (training_time))
 print('Inference time: %.2f s' % (inference_time))
-print('Average Inference time: %.4f ms' % 1000*(inference_time/test_total))
+print('Average Inference time: %.4f ms'%((1000.0*inference_time)/test_total))
+# print('Average Inference time: %.4f ms' % 1000.*(inference_time/len(test_dataset)))
 
 #create scatterplots, Problem 1.2
 plt.scatter(epochs,trainloss, label="Training Loss")
