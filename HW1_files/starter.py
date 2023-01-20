@@ -67,13 +67,7 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-# Training loop
-epochs = []
-trainloss = []
-testloss = []
-trainacc = []
-testacc = []
-
+#Capture memory usage with process, Problem 1.3
 def mcheck():
     log = open('starter/memcheck.txt', 'a')
     while True:
@@ -81,6 +75,14 @@ def mcheck():
         mem = subprocess.run(['nvidia-smi'],stdout=subprocess.PIPE)
         log.write(mem.stdout.decode('utf-8'))
 memcheck = Process(target = mcheck)
+
+# Training loop
+epochs = []
+trainloss = []
+testloss = []
+trainacc = []
+testacc = []
+training_time = 0
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -88,8 +90,8 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
+    memcheck.start() #start memory check
     start = time.time()
-    memcheck.start()
     for train_batch_idx, (images, labels) in enumerate(train_loader):
         # Here we vectorize the 28*28 images as several 784-dimensional inputs
         images = images.to(device)
@@ -117,10 +119,11 @@ for epoch in range(num_epochs):
                                                                              len(train_dataset) // batch_size,
                                                                              train_loss / (train_batch_idx + 1),
                                                                              100. * train_correct / train_total))
-    memcheck.terminate()
-    # Testing phase
     end = time.time()
-    train_time = end-start
+    training_time += (end-start)
+    memcheck.terminate() #stop memory check
+
+    # Testing phase
     test_correct = 0
     test_total = 0
     test_loss = 0
@@ -128,7 +131,6 @@ for epoch in range(num_epochs):
     model = model.eval()
     # Disabling gradient calculation is useful for inference.
     # It will reduce memory consumption for computations.
-    inference_time = 0
     with torch.no_grad():
         for test_batch_idx, (images, labels) in enumerate(test_loader):
             images = images.to(device)
@@ -138,8 +140,6 @@ for epoch in range(num_epochs):
             # Perform the actual inference
             start = time.time()
             outputs = model(images)
-            end = time.time()
-            inference_time += end-start
             # Compute the loss
             loss = criterion(outputs, labels)
             test_loss += loss.item()
@@ -152,13 +152,33 @@ for epoch in range(num_epochs):
     print('Epoch: %.0f'%(epoch+1))
     print('Train accuracy: %.2f %% Train loss: %.4f' % (100. * train_correct / train_total, train_loss / (train_batch_idx+1)))
     print('Test accuracy: %.2f %% Test loss: %.4f' % (100. * test_correct / test_total, test_loss / (test_batch_idx + 1)))
-    print('Train time: %.2f s, Total Inference time: %.2f s, Average Inference Time: %.6f s\n' % (train_time, inference_time, (inference_time/test_total)))
     epochs.append(epoch+1)
     trainloss.append(train_loss / (train_batch_idx+1))
     testloss.append(test_loss / (test_batch_idx + 1))
     trainacc.append(100. * train_correct / train_total)
     testacc.append(100. * test_correct / test_total)
 
+#inference time profiling, Problem 1.3 (Total inference time, Average Inference time)
+inference_time = 0
+with torch.no_grad():
+    test_loader.batch_size = 1
+    for infbatch, (images,labels) in enumerate(test_loader):
+        images = images.to(device)
+        labels = labels.to(device)
+        # Here we vectorize the 28*28 images as several 784-dimensional inputs
+        images = images.view(-1, input_size)
+        # Perform the actual inference
+        start = time.time()
+        outputs = model(images)
+        inference_time += (time.time()-start)
+
+
+#Print results, Problem 1.3
+print('Train time: %.2f s\n' % (training_time))
+print('Inference time: %.2f s' % (inference_time))
+print('Average Inference time: %.4f ms' % 1000*(inference_time/test_total))
+
+#create scatterplots, Problem 1.2
 plt.scatter(epochs,trainloss, label="Training Loss")
 plt.scatter(epochs,testloss, label = "Test Loss")
 plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
