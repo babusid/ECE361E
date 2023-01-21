@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 from multiprocessing import Process
-import sys
-import os
 import subprocess
 
 # Argument parser
@@ -67,17 +65,21 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-#Capture memory usage with process, Problem 1.3
+# Capture memory usage with process, Problem 1.3
 def mcheck():
+    SMI_QUERY = 'nvidia-smi --query-gpu=uuid,timestamp,utilization.gpu,memory.used --format=csv'
     log = open('starter/memcheck.txt', 'a')
     while True:
-        time.sleep(.1)
         try:
-            mem = subprocess.run(['nvidia-smi'],stdout=subprocess.PIPE)
+            output = subprocess.check_output(SMI_QUERY.split(), stderr=subprocess.STDOUT).decode('utf-8')
         except subprocess.SubprocessError:
             print('Error: nvidia-smi not found')
-            memcheck.kill()
-        log.write(mem.stdout.decode('utf-8'))
+            break
+        with open('starter/memcheck.txt', 'a') as f:
+            f.write(output)
+        time.sleep(0.1)
+memcheck_process = Process(target = mcheck)
+memcheck_process.start()
 
 # Training loop
 epochs = []
@@ -93,8 +95,6 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
-    memcheck = Process(target = mcheck)
-    memcheck.start() #start memory check
     start = time.time()
     for train_batch_idx, (images, labels) in enumerate(train_loader):
         # Here we vectorize the 28*28 images as several 784-dimensional inputs
@@ -125,7 +125,6 @@ for epoch in range(num_epochs):
                                                                              100. * train_correct / train_total))
     end = time.time()
     training_time += (end-start)
-    memcheck.terminate() #stop memory check
 
     # Testing phase
     test_correct = 0
@@ -162,6 +161,10 @@ for epoch in range(num_epochs):
     trainacc.append(100. * train_correct / train_total)
     testacc.append(100. * test_correct / test_total)
 
+#kill memory profiling process
+memcheck_process.terminate()
+memcheck_process.join()
+
 #inference time profiling, Problem 1.3 (Total inference time, Average Inference time)
 inference_time = 0
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=1, shuffle=False)
@@ -183,21 +186,36 @@ print('Inference time: %.2f s' % (inference_time))
 print('Average Inference time: %.4f ms'%((1000.0*inference_time)/test_total))
 # print('Average Inference time: %.4f ms' % 1000.*(inference_time/len(test_dataset)))
 
-#create scatterplots, Problem 1.2
-plt.scatter(epochs,trainloss, label="Training Loss")
-plt.scatter(epochs,testloss, label = "Test Loss")
-plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.legend()
-plt.savefig('starter/lossplot_1_2.png')
-plt.clf()
+with open('starter/lossacc.csv', 'w') as f:
 
-plt.scatter(epochs,trainacc, label="Training Accuracy")
-plt.scatter(epochs,testacc, label="Testing Accuracy")
-plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
-plt.xlabel('epochs')
-plt.ylabel('accuracy')
-plt.legend()
-plt.savefig('starter/accplot_1_2.png')
-plt.clf()
+    def array_write_named_row(fd, rowname, array):
+        fd.write(rowname + ',' + ','.join(map(str, array)) + '\n')
+    
+    for e in [
+            ('Epoch', epochs),
+            ('TrainLoss', trainloss),
+            ('TestLoss', testloss),
+            ('TrainAcc', trainacc),
+            ('TestAcc', testacc)]:
+        array_write_named_row(f, e[0], e[1])
+
+#create scatterplots, Problem 1.2
+# plt.scatter(epochs,trainloss, label="Training Loss")
+# plt.scatter(epochs,testloss, label = "Test Loss")
+# plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+# plt.xlabel('epochs')
+# plt.ylabel('loss')
+# plt.legend()
+# plt.savefig('starter/lossplot_1_2.png')
+# plt.clf()
+
+# plt.scatter(epochs,trainacc, label="Training Accuracy")
+# plt.scatter(epochs,testacc, label="Testing Accuracy")
+# plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+# plt.xlabel('epochs')
+# plt.ylabel('accuracy')
+# plt.legend()
+# plt.savefig('starter/accplot_1_2.png')
+# plt.clf()
+
+print('Finished')

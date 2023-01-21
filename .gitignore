@@ -4,3 +4,5 @@ starter/
 simpleFC*/
 simpleCNN/
 simpleCNN_2/
+*.e*
+*.o*
