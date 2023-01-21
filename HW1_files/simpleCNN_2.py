@@ -10,6 +10,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+DIRECTORY_NAME = 'simpleCNN_2'
+
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleCNN')
 # Define the mini-batch size, here the size is 128 images per batch
@@ -125,6 +127,8 @@ for epoch in range(num_epochs):
     # It will reduce memory consumption for computations.
     with torch.no_grad():
         for test_batch_idx, (images, labels) in enumerate(test_loader):
+            images = images.to(device)
+            labels = labels.to(device)
             # Perform the actual inference
             outputs = model(images)
             # Compute the loss
@@ -151,25 +155,39 @@ print("Saved Model size on disk: %i kb"%size)
 
 #Profiling the models operations
 input = torch.randn(1,1,28,28)
-macs, params = profile(model, inputs=(input, ))
+macs, params = profile(model.cpu(), inputs=(input, ))
 print("MACs: %i"%macs)
 print("FLOPs: %i"%(macs*2))
 
+with open(os.path.join(DIRECTORY_NAME, 'lossacc.csv'), 'w') as f:
 
-plt.scatter(epochs,trainloss, label="Training Loss")
-plt.scatter(epochs,testloss, label = "Test Loss")
-plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.legend()
-plt.savefig('simpleCNN_2/lossplot_3_2.png')
-plt.clf()
+    def array_write_named_row(fd, rowname, array):
+        fd.write(rowname + ',' + ','.join(map(str, array)) + '\n')
+    
+    for e in [
+            ('Epoch', epochs),
+            ('TrainLoss', trainloss),
+            ('TestLoss', testloss),
+            ('TrainAcc', trainacc),
+            ('TestAcc', testacc)]:
+        array_write_named_row(f, e[0], e[1])
 
-plt.scatter(epochs,trainacc, label="Training Accuracy")
-plt.scatter(epochs,testacc, label="Testing Accuracy")
-plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
-plt.xlabel('epochs')
-plt.ylabel('accuracy')
-plt.legend()
-plt.savefig('simpleCNN_2/accplot_3_2.png')
-plt.clf()
+# plt.scatter(epochs,trainloss, label="Training Loss")
+# plt.scatter(epochs,testloss, label = "Test Loss")
+# plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+# plt.xlabel('epochs')
+# plt.ylabel('loss')
+# plt.legend()
+# plt.savefig('simpleCNN_2/lossplot_3_2.png')
+# plt.clf()
+
+# plt.scatter(epochs,trainacc, label="Training Accuracy")
+# plt.scatter(epochs,testacc, label="Testing Accuracy")
+# plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+# plt.xlabel('epochs')
+# plt.ylabel('accuracy')
+# plt.legend()
+# plt.savefig('simpleCNN_2/accplot_3_2.png')
+# plt.clf()
+
+print('Finished')

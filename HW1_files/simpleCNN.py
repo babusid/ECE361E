@@ -116,6 +116,8 @@ for epoch in range(num_epochs):
     # It will reduce memory consumption for computations.
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(test_loader):
+            images = images.to(device)
+            labels = labels.to(device)
             # Perform the actual inference
             outputs = model(images)
             # Compute the loss
@@ -137,6 +139,6 @@ size /= 1024
 print("Saved Model size on disk: %i kb"%size)
 #Profiling the models operations
 input = torch.randn(1,1,28,28)
-macs, params = profile(model, inputs=(input, ))
+macs, params = profile(model.cpu(), inputs=(input, ))
 print("MACs: %i"%macs)
 print("FLOPs: %i"%(macs*2))

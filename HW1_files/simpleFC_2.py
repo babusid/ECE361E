@@ -7,6 +7,9 @@ import argparse
 import matplotlib.pyplot as plt
 import time
 import numpy as np
+import os
+
+DIRECTORY_NAME = 'simpleFC_2'
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleFC')
@@ -131,6 +134,8 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
         # It will reduce memory consumption for computations.
         with torch.no_grad():
             for test_batch_idx, (images, labels) in enumerate(test_loader):
+                images = images.to(device)
+                labels = labels.to(device)
                 # Here we vectorize the 28*28 images as several 784-dimensional inputs
                 images = images.view(-1, input_size)
                 # Perform the actual inference
@@ -156,13 +161,28 @@ for dropoutFraction in [0.0,0.2,0.5,0.8]:
         trainacc.append(100. * train_correct / train_total)
         testacc.append(100. * test_correct / test_total)
     print("Total training time: %.2f s\n\n" % total_train_time)
-    plt.scatter(epochs,trainloss, label="Training Loss")
-    plt.scatter(epochs,testloss, label = "Test Loss")
-    plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
-    plt.xlabel('epochs')
-    plt.ylabel('loss')
-    plt.title('Loss vs Epochs, Dropout = %.1f'%(dropoutFraction))
-    plt.legend()
-    plt.savefig('simpleFC_2/lossplot_2_2_unnormalized_%.1f.png'%(dropoutFraction))
-    plt.clf()
 
+    with open(os.path.join(DIRECTORY_NAME, f'lossacc_{dropoutFraction:.1f}.csv'), 'w') as f:
+
+        def array_write_named_row(fd, rowname, array):
+            fd.write(rowname + ',' + ','.join(map(str, array)) + '\n')
+        
+        for e in [
+                ('Epoch', epochs),
+                ('TrainLoss', trainloss),
+                ('TestLoss', testloss),
+                ('TrainAcc', trainacc),
+                ('TestAcc', testacc)]:
+            array_write_named_row(f, e[0], e[1])
+
+    # plt.scatter(epochs,trainloss, label="Training Loss")
+    # plt.scatter(epochs,testloss, label = "Test Loss")
+    # plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
+    # plt.xlabel('epochs')
+    # plt.ylabel('loss')
+    # plt.title('Loss vs Epochs, Dropout = %.1f'%(dropoutFraction))
+    # plt.legend()
+    # plt.savefig('simpleFC_2/lossplot_2_2_unnormalized_%.1f.png'%(dropoutFraction))
+    # plt.clf()
+
+print('Finished')

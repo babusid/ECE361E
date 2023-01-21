@@ -4,10 +4,12 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import argparse
 import matplotlib.pyplot as plt
-import numpy as np
+import os
 import time
 from multiprocessing import Process
 import subprocess
+
+DIRECTORY_NAME = 'starter'
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - Starter code')
@@ -45,7 +47,6 @@ test_dataset = dsets.MNIST(root='data', train=False, transform=transforms.ToTens
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
-
 # Define your model
 class LogisticRegression(nn.Module):
     def __init__(self, input_size, num_classes):
@@ -68,16 +69,21 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 # Capture memory usage with process, Problem 1.3
 def mcheck():
     SMI_QUERY = 'nvidia-smi --query-gpu=uuid,timestamp,utilization.gpu,memory.used --format=csv'
-    log = open('starter/memcheck.txt', 'a')
+    logfile = os.path.join(DIRECTORY_NAME, 'memcheck.txt')
+    with open(logfile, 'w') as f:
+        f.write(SMI_QUERY)
+        f.write('\n')
     while True:
         try:
             output = subprocess.check_output(SMI_QUERY.split(), stderr=subprocess.STDOUT).decode('utf-8')
         except subprocess.SubprocessError:
             print('Error: nvidia-smi not found')
             break
-        with open('starter/memcheck.txt', 'a') as f:
+        with open(logfile, 'a') as f:
             f.write(output)
         time.sleep(0.1)
+
+# start memory logging process
 memcheck_process = Process(target = mcheck)
 memcheck_process.start()
 
@@ -186,7 +192,7 @@ print('Inference time: %.2f s' % (inference_time))
 print('Average Inference time: %.4f ms'%((1000.0*inference_time)/test_total))
 # print('Average Inference time: %.4f ms' % 1000.*(inference_time/len(test_dataset)))
 
-with open('starter/lossacc.csv', 'w') as f:
+with open(os.path.join(DIRECTORY_NAME, 'lossacc.csv'), 'w') as f:
 
     def array_write_named_row(fd, rowname, array):
         fd.write(rowname + ',' + ','.join(map(str, array)) + '\n')

@@ -5,8 +5,10 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 import argparse
 import matplotlib.pyplot as plt
-import numpy as np
+import os
 import time
+
+DIRECTORY_NAME = 'simpleFC'
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW1 - SimpleFC')
@@ -144,6 +146,20 @@ for epoch in range(num_epochs):
     trainacc.append(100. * train_correct / train_total)
     testacc.append(100. * test_correct / test_total)
 
+
+with open(os.path.join(DIRECTORY_NAME, 'lossacc.csv'), 'w') as f:
+
+    def array_write_named_row(fd, rowname, array):
+        fd.write(rowname + ',' + ','.join(map(str, array)) + '\n')
+    
+    for e in [
+            ('Epoch', epochs),
+            ('TrainLoss', trainloss),
+            ('TestLoss', testloss),
+            ('TrainAcc', trainacc),
+            ('TestAcc', testacc)]:
+        array_write_named_row(f, e[0], e[1])
+
 # plt.scatter(epochs,trainloss, label="Training Loss")
 # plt.scatter(epochs,testloss, label = "Test Loss")
 # plt.xticks(np.asarray(np.arange(1,num_epochs+1)))
@@ -161,3 +177,5 @@ for epoch in range(num_epochs):
 # plt.legend()
 # plt.savefig('simpleFC/accplot_2_1.png')
 # plt.clf()
+
+print('Finished')
