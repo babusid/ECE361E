@@ -25,24 +25,24 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/apps/cuda/11.3/lib64
 source $WORK/HW1_virtualenv/bin/activate
 
 # Launch code...
-# mkdir -p $WORK/ECE361E_HW1/HW1_files/starter # Problem 1
-# python $WORK/ECE361E_HW1/HW1_files/starter.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/starter/starter_out.txt
+mkdir -p $WORK/ECE361E_HW1/HW1_files/starter # Problem 1
+python $WORK/ECE361E_HW1/HW1_files/starter.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/starter/starter_out.txt
 
-# mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC # Problem 2.1
-# python $WORK/ECE361E_HW1/HW1_files/simpleFC.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC/simpleFC_out.txt
+mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC # Problem 2.1
+python $WORK/ECE361E_HW1/HW1_files/simpleFC.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC/simpleFC_out.txt
 
-# mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC_2 # Problem 2.2
-# python $WORK/ECE361E_HW1/HW1_files/simpleFC_2.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC_2/simpleFC_2_out.txt
+mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC_2 # Problem 2.2
+python $WORK/ECE361E_HW1/HW1_files/simpleFC_2.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC_2/simpleFC_2_out.txt
 
-# mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC_3 # Problem 2.3
-# python $WORK/ECE361E_HW1/HW1_files/simpleFC_3.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC_3/simpleFC_3_out.txt
+mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleFC_3 # Problem 2.3
+python $WORK/ECE361E_HW1/HW1_files/simpleFC_3.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleFC_3/simpleFC_3_out.txt
 
 mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleCNN # Problem 3
 mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleCNN/model_saves
-python $WORK/ECE361E_HW1/HW1_files/simpleCNN.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleCNN/simpleCNN_out.txt
+python $WORK/ECE361E_HW1/HW1_files/simpleCNN.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleCNN/simpleCNN_out.txt
 
 mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleCNN_2 # Problem 3.2
 mkdir -p $WORK/ECE361E_HW1/HW1_files/simpleCNN_2/model_saves
-python $WORK/ECE361E_HW1/HW1_files/simpleCNN_2.py --batch_size=128 --epochs=2 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleCNN_2/simpleCNN_2_out.txt
+python $WORK/ECE361E_HW1/HW1_files/simpleCNN_2.py --batch_size=128 --epochs=25 --lr=0.01 > $WORK/ECE361E_HW1/HW1_files/simpleCNN_2/simpleCNN_2_out.txt
 # ---------------------------------------------------
 
