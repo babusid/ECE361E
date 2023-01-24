@@ -1,3 +1,13 @@
 HW1_virtualenv/
 *.e*
 *.o*
+data/
+starter/
+simpleFC*/
+simpleCNN/
+simpleCNN_2/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
