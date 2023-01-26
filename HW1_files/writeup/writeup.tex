@@ -104,8 +104,9 @@ This model does overfit slightly. Past epoch 5, we can see that the training acc
             \hline
         \end{tabularx}
     \end{center}
-The best dropout fraction is 0.5. The no dropout model has a significantly divergent training and test loss, with the test loss being much worse. This indicates an overfit model.
-The 0.2 dropout model has a similar divergence, but on a much smaller scale. It has almost the same testing loss, but is slightly worse, indicating that it is close but not as good at generalizing as the 0.5 dropout model. The 0.8 dropout model has the opposite problem, with a significantly higher training and testing loss, indicating a severely underfit model. 
+The best dropout fraction is 0.5. The no dropout model has a significantly divergent training and test loss, with the test loss being much worse. This indicates an overfit model. \\
+The 0.2 dropout model has a similar divergence, but on a much smaller scale. It has almost the same testing loss, but is slightly worse, indicating that it is close but not as good at generalizing as the 0.5 dropout model. The 0.8 dropout model has the opposite problem, with a significantly higher training and testing loss, indicating a severely underfit model. \\
+These results, especially the 0.2 vs 0.5 case, shows that the dropout helps against overfitting in the model, though the 0.8 case shows that too much dropout causes loss to increase. The loss in accuracy can be explained by the large dropout resulting in too little complexity to fit the problem.
 
 
 \subsection{Question 3}
@@ -148,6 +149,8 @@ We can see that the normalized version of the model reaches 96\% training accura
       \hline
     \end{tabularx}
 \end{center}
+
+The saved model size is many times smaller than the in-memory model size. This is due to a combination of data compression with the saved format and eliminating the added space of model metadata. Additionally, in-memory tensors and other model elements are located sparsely in memory to increase performance with the model's memory access patterns; this sparsity can be eliminated when saving the model to disk.
 
 \begin{figure}[H]
     \noindent
