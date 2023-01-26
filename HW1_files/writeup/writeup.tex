@@ -170,5 +170,8 @@ The saved model size is many times smaller than the in-memory model size. This i
 \subsection{BONUS Question 3}
 We retained most of SimpleCNN's architecture, but added a batch normalization layer before the second convolutional layer. This follows an intuition developed in the previous problem where we saw results improve with a normalized input. By adding a batch normalization layer in the middle of the network, we can mitigate covariate shift internal to the network, and cause the network to generalize better. This is reflected in the results, as it performs significantly better than the best of the previous models, with a training loss of almost 0.0005 and a test loss of 0.0340. While there is some (small) difference between the training loss and the test loss, indicating some overfitting to the train set, it retains extremely good general performance. This is likely due to the high uniformity of the MNIST dataset making it difficult to severely overfit. 
 
+\subsection{Partner Contribution Split and Valuable Things Learned}
+We attempted to split the work evenly and worked on all the models simultaneously. The writeup was divvied up in a similar manner. \\
+The most valuable things we learned from this homework are the process for creating and training models in PyTorch and developing intuition and experience regarding overfitting/underfitting models.
 
 \end{document}
