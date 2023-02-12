@@ -3,7 +3,6 @@ import telnetlib as tel
 import sysfs_paths as sysfs
 import time
 
-
 def get_telnet_power(telnet_connection, last_power):
     """
     Read power values using telnet.
@@ -52,44 +51,50 @@ def get_core_freq(core_num):
     with open(sysfs.fn_cpu_freq_read.format(core_num), 'r') as f:
         return int(f.read().strip())
 
+class GoAheadAndMeasureSomeThingsForMe():
 
-# Create a text file to log the results
-out_fname = 'log.csv'
-header = "time, W, usage_c0, usage_c1, usage_c2, usage_c3, usage_c4, usage_c5, usage_c6, usage_c7, temp4, temp5, temp6, temp7"
-header = "\t".join(header.split('\t'))
-out_file = open(out_fname, 'w')
-out_file.write(header)
-out_file.write("\n")
+    def __init__(self, filename, msg_queue):
+        self.fname = filename
+        self.q = msg_queue
 
-# Measurement
-telnet_connection = tel.Telnet("192.168.4.1")
-total_power = 0.0
-for i in range(100):
-    last_time = time.time()  # time_stamp
-    # System power
-    total_power = get_telnet_power(telnet_connection, total_power)
-    print('Telnet power [W]:', total_power)
+    def run(self):
+        # Create a text file to log the results
+        out_fname = self.fname
+        header = "time W usage_c0 usage_c1 usage_c2 usage_c3 usage_c4 usage_c5 usage_c6 usage_c7 temp4 temp5 temp6 temp7"
+        header = ",".join(header.split(' '))
+        out_file = open(out_fname, 'w')
+        out_file.write(header)
+        out_file.write("\n")
 
-    # CPU load
-    usages = get_cpu_load()
-    print('CPU usage:', usages)
+        # Measurement
+        telnet_connection = tel.Telnet("192.168.4.1")
+        total_power = 0.0
+        while(self.q.empty()):
+            last_time = time.time()  # time_stamp
+            # System power
+            total_power = get_telnet_power(telnet_connection, total_power)
+            print('Telnet power [W]:', total_power, end='\t')
 
-    # Temp for big cores
-    temps = get_temps()
-    print('Temperature of big cores:', temps)
+            # CPU load
+            usages = get_cpu_load()
+            print('CPU usage:', usages)
 
-    # Big cluster core frequencies
-    freq_4 = get_core_freq(core_num=4)
-    print('core4 frequency : ', freq_4)
+            # Temp for big cores
+            temps = get_temps()
+            print('Temperature of big cores:', temps, end='\t')
 
-    time_stamp = last_time
-    # Data write out:
-    fmt_str = "{}," * 14
-    out_ln = fmt_str.format(time_stamp, total_power, usages[0], usages[1], usages[2], usages[3], usages[4], usages[5],
-                            usages[6], usages[7], temps[0], temps[1], temps[2], temps[3])
+            # Big cluster core frequencies
+            freq_4 = get_core_freq(core_num=4)
+            print('core4 frequency:', freq_4)
 
-    out_file.write(out_ln)
-    out_file.write("\n")
-    elapsed = time.time() - last_time
-    DELAY = 0.2
-    time.sleep(max(0., DELAY - elapsed))
+            time_stamp = last_time
+            # Data write out:
+            fmt_str = "{}," * 14
+            out_ln = fmt_str.format(time_stamp, total_power, usages[0], usages[1], usages[2], usages[3], usages[4], usages[5],
+                                    usages[6], usages[7], temps[0], temps[1], temps[2], temps[3])
+
+            out_file.write(out_ln)
+            out_file.write("\n")
+            elapsed = time.time() - last_time
+            DELAY = 0.2
+            time.sleep(max(0., DELAY - elapsed))
