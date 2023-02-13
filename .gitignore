@@ -1,6 +1,7 @@
 HW1_virtualenv/
 *.e*
 *.o*
+.vscode
 data/
 starter/
 simpleFC*/
@@ -11,3 +12,4 @@ simpleCNN_2/
 *.fls
 *.log
 *.synctex.gz
+*.xdv

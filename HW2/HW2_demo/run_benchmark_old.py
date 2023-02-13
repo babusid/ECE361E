@@ -1,8 +1,7 @@
 import sysfs_paths as sysfs
 import subprocess
 import time
-import multiprocessing as mp
-import measurement
+
 
 def get_avail_freqs(cluster):
     """
@@ -40,32 +39,19 @@ def set_cluster_freq(cluster_num, frequency):
     with open(sysfs.fn_cluster_freq_set.format(cluster_num), 'w') as f:
         f.write(str(frequency))
 
-def start_measuring(filename, msg_queue):
-    measurement.GoAheadAndMeasureSomeThingsForMe(filename, msg_queue).run()
 
-if __name__ == '__main__':
+print('Available freqs for LITTLE cluster:', get_avail_freqs(0))
+print('Available freqs for big cluster:', get_avail_freqs(4))
+set_user_space()
+set_cluster_freq(4, 2000000)   # big cluster
+# print current freq for the big cluster
+print('Current freq for big cluster:', get_cluster_freq(4))
 
-    print('Available freqs for LITTLE cluster:', get_avail_freqs(0))
-    print('Available freqs for big cluster:', get_avail_freqs(4))
-    set_user_space()
-    set_cluster_freq(4, 2000000)   # big cluster
-    # print current freq for the big cluster
-    print('Current freq for big cluster:', get_cluster_freq(4))
+# execution of your benchmark    
+start=time.time()
+# run the benchmark
+command = "taskset --all-tasks 0x20 /home/student/HW2_files/TPBench.exe"   # 0x20: core 5
+proc_ben = subprocess.call(command.split())
 
-    stop_measurement = mp.Queue()
-    filename = 'bodytrack_log.csv'
-    measurement_process = mp.Process(target=start_measuring, args=(filename, stop_measurement))
-    measurement_process.start()
-
-    # execution of your benchmark    
-    start=time.time()
-    # run the benchmark
-    command = "taskset --all-tasks 0xF0 parsec_files/bodytrack parsec_files/sequenceB_261 4 260 3000 8 3 4 0"
-    proc_ben = subprocess.call(command.split())
-
-    total_time = time.time() - start
-    print("Benchmark runtime:", total_time)
-
-    stop_measurement.put('please stop running ♥‿♥')
-    measurement_process.join()
-    
+total_time = time.time() - start
+print("Benchmark runtime:", total_time)
