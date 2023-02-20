@@ -86,6 +86,10 @@ def mcheck():
             f.write(output)
         time.sleep(0.1)
 
+# start memory logging process
+memcheck_process = Process(target = mcheck)
+memcheck_process.start()
+
 # Training loop
 train_time = 0
 for epoch in range(num_epochs):
@@ -124,7 +128,10 @@ for epoch in range(num_epochs):
                                                                              train_loss / (batch_idx + 1),
                                                                              100. * train_correct / train_total))
     train_time += (time.time() - start)
-    
+    #kill memory profiling process
+    memcheck_process.terminate()
+    memcheck_process.join()
+
     # Testing phase
     test_correct = 0
     test_total = 0
