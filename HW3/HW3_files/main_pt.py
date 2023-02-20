@@ -1,8 +1,16 @@
+import time
 import torch
 import torch.nn as nn
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import argparse
+from thop import profile
+import os
+from multiprocessing import Process
+import subprocess
+from torchinfo import summary
+from models.vgg11_pt import VGG11
+from models.vgg16_pt import VGG16
 
 # Argument parser
 parser = argparse.ArgumentParser(description='ECE361E HW3 - Starter PyTorch code')
@@ -10,12 +18,17 @@ parser = argparse.ArgumentParser(description='ECE361E HW3 - Starter PyTorch code
 parser.add_argument('--batch_size', type=int, default=128, help='Number of samples per mini-batch')
 # Define the number of epochs for training
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train')
+
+#which model to use
+parser.add_argument('--model', type=str, default='VGG11', help='Which model to use (VGG11 or VGG16)')
 args = parser.parse_args()
 
 # Always make assignments to local variables from your args at the beginning of your code for better
 # control and adaptability
 num_epochs = args.epochs
 batch_size = args.batch_size
+DIRECTORY_NAME = args.model + "_logs"
+
 
 # Each experiment you will do will have slightly different results due to the randomness
 # of the initialization value for the weights of the model. In order to have reproducible results,
@@ -38,16 +51,43 @@ test_dataset = dsets.CIFAR10(root='data', train=False, transform=transforms.Comp
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
-# TODO: Get VGG11 model
-model = None
+# Get chosen model
+model = VGG11() if (args.model == 'VGG11') else VGG16()
 
-# TODO: Put the model on the GPU
+# Put the model on the GPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = model.to(device)
+
 
 # Define your loss and optimizer
 criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 optimizer = torch.optim.Adam(model.parameters())
 
+#metrics save file
+metricsfile = os.path.join(DIRECTORY_NAME,'metrics.csv')
+with open(metricsfile, 'w') as f:
+    f.write('epoch,train_loss,train_acc,test_loss,test_acc\n')
+    f.close()
+
+# Capture memory usage with process
+def mcheck():
+    SMI_QUERY = 'nvidia-smi --query-gpu=uuid,timestamp,utilization.gpu,memory.used --format=csv'
+    logfile = os.path.join(DIRECTORY_NAME, 'memcheck.txt')
+    with open(logfile, 'w') as f:
+        f.write(SMI_QUERY)
+        f.write('\n')
+    while True:
+        try:
+            output = subprocess.check_output(SMI_QUERY.split(), stderr=subprocess.STDOUT).decode('utf-8')
+        except subprocess.SubprocessError:
+            print('Error: nvidia-smi not found')
+            break
+        with open(logfile, 'a') as f:
+            f.write(output)
+        time.sleep(0.1)
+
 # Training loop
+train_time = 0
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -55,8 +95,11 @@ for epoch in range(num_epochs):
     train_loss = 0
     # Sets the model in training mode.
     model = model.train()
+    start = time.time()
     for batch_idx, (images, labels) in enumerate(train_loader):
-        # TODO: Put the images and labels on the GPU
+        # Put the images and labels on the GPU
+        images = images.to(device)
+        labels = labels.to(device)
 
         # Sets the gradients to zero
         optimizer.zero_grad()
@@ -80,6 +123,8 @@ for epoch in range(num_epochs):
                                                                              len(train_dataset) // batch_size,
                                                                              train_loss / (batch_idx + 1),
                                                                              100. * train_correct / train_total))
+    train_time += (time.time() - start)
+    
     # Testing phase
     test_correct = 0
     test_total = 0
@@ -90,7 +135,9 @@ for epoch in range(num_epochs):
     # It will reduce memory consumption for computations.
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(test_loader):
-            # TODO: Put the images and labels on the GPU
+            # Put the images and labels on the GPU
+            images = images.to(device)
+            labels = labels.to(device)
 
             # Perform the actual inference
             outputs = model(images)
@@ -104,4 +151,24 @@ for epoch in range(num_epochs):
             test_correct += predicted.eq(labels).sum().item()
     print('Test loss: %.4f Test accuracy: %.2f %%' % (test_loss / (batch_idx + 1),100. * test_correct / test_total))
 
-    # TODO: Save the PyTorch model in .pt format
+    #update metrics file
+    with open(metricsfile, 'a') as f:
+        f.write(    f'{epoch},'+  #epoch
+                    f'{train_loss / (batch_idx + 1):.4f},'+ #train loss
+                    f'{100. * train_correct / train_total:.2f},'+ #train acc
+                    f'{test_loss / (batch_idx + 1):.4f},'+ #test loss
+                    f'{100. * test_correct / test_total:.2f}\n' #test acc
+                )
+        f.close()
+
+
+print(f'Training time: {train_time:.2f} seconds')
+print(f'Training accuracy {100. * train_correct / train_total:.2f} %')
+print(f'Test accuracy {100. * test_correct / test_total:.2f} %')
+input = torch.randn(1, 3, 32, 32)
+macs, params = profile(model, inputs=(input, ))
+print("FLOPs: \n", macs * 2)
+summary(model, (3, 32, 32))
+
+# Save the PyTorch model in .pt format
+torch.save(model.state_dict(), 'VGG11.pt' if (type(model) == type(VGG11)) else 'VGG16.pt')
