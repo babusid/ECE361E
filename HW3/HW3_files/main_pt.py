@@ -27,7 +27,7 @@ args = parser.parse_args()
 # control and adaptability
 num_epochs = args.epochs
 batch_size = args.batch_size
-DIRECTORY_NAME = args.model + "_logs"
+DIRECTORY_NAME = args.model + "_dir"
 
 
 # Each experiment you will do will have slightly different results due to the randomness
@@ -65,6 +65,7 @@ optimizer = torch.optim.Adam(model.parameters())
 
 #metrics save file
 metricsfile = os.path.join(DIRECTORY_NAME,'metrics.csv')
+os.makedirs(os.path.dirname(metricsfile), exist_ok=True)
 with open(metricsfile, 'w') as f:
     f.write('epoch,train_loss,train_acc,test_loss,test_acc\n')
     f.close()
@@ -73,6 +74,7 @@ with open(metricsfile, 'w') as f:
 def mcheck():
     SMI_QUERY = 'nvidia-smi --query-gpu=uuid,timestamp,utilization.gpu,memory.used --format=csv'
     logfile = os.path.join(DIRECTORY_NAME, 'memcheck.txt')
+    os.makedirs(os.path.dirname(logfile), exist_ok=True)
     with open(logfile, 'w') as f:
         f.write(SMI_QUERY)
         f.write('\n')
@@ -169,13 +171,18 @@ for epoch in range(num_epochs):
         f.close()
 
 
-print(f'Training time: {train_time:.2f} seconds')
+print(f'\nTraining time: {train_time:.2f} seconds')
 print(f'Training accuracy {100. * train_correct / train_total:.2f} %')
 print(f'Test accuracy {100. * test_correct / test_total:.2f} %')
 input = torch.randn(1, 3, 32, 32)
+input = input.to(device)
+
+start = time.time()
 macs, params = profile(model, inputs=(input, ))
-print("FLOPs: \n", macs * 2)
-summary(model, (3, 32, 32))
+start = time.time() - start
+print("Total FLO: \n", macs * 2)
+print("Total FLOPS: \n", (macs * 2) / start)
+summary(model, (1, 3, 32, 32))
 
 # Save the PyTorch model in .pt format
-torch.save(model.state_dict(), 'VGG11.pt' if (type(model) == type(VGG11)) else 'VGG16.pt')
+torch.save(model.state_dict(), 'VGG11.pt' if (type(model) == type(VGG11())) else 'VGG16.pt')
