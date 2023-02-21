@@ -25,8 +25,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/apps/cuda/11.3/lib64
 source $WORK/HW3_virtualenv/bin/activate
 
 # Launch code...
-CUDA_VISIBLE_DEVICES=0 python $WORK/HW3_files/main_pt.py --batch_size=128 --epochs=200 > $WORK/HW3_files/out/p1/vgg11/out.txt &
-CUDA_VISIBLE_DEVICES=1 python $WORK/HW3_files/main_pt.py --batch_size=128 --epochs=200 --model=VGG16 > $WORK/HW3_files/out/p1/vgg16/out.txt &
+CUDA_VISIBLE_DEVICES=0 python $WORK/HW3_files/main_pt.py --batch_size=128 --epochs=100 > $WORK/HW3_files/out/p1/vgg11/out.txt &
+CUDA_VISIBLE_DEVICES=1 python $WORK/HW3_files/main_pt.py --batch_size=128 --epochs=100 --model=VGG16 > $WORK/HW3_files/out/p1/vgg16/out.txt &
 wait
 
 # ---------------------------------------------------

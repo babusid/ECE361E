@@ -89,8 +89,6 @@ def mcheck():
             f.write(output)
         time.sleep(0.1)
 
-# start memory logging process
-
 # Training loop
 train_time = 0
 for epoch in range(num_epochs):
@@ -172,7 +170,19 @@ for epoch in range(num_epochs):
                     f'{100. * test_correct / test_total:.2f}\n' #test acc
                 )
         f.close()
-
+    torch.save(
+        model.state_dict(), 
+        os.path.join(DIRECTORY_NAME,f'VGG11_{epoch}.pt') 
+        if (type(model) == type(VGG11())) else 
+        os.path.join(DIRECTORY_NAME,f'VGG16_{epoch}.pt')
+    )
+    torch.save(
+        optimizer.state_dict(),
+        os.path.join(DIRECTORY_NAME,f'VGG11_{epoch}_optimizer.pt')
+        if (type(model) == type(VGG11())) else
+        os.path.join(DIRECTORY_NAME,f'VGG16_{epoch}_optimizer.pt')
+    )
+    print(f'Training time: {train_time:.2f} seconds')
 
 print(f'\nTraining time: {train_time:.2f} seconds')
 print(f'Training accuracy {100. * train_correct / train_total:.2f} %')
