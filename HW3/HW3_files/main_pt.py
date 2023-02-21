@@ -28,6 +28,7 @@ args = parser.parse_args()
 num_epochs = args.epochs
 batch_size = args.batch_size
 DIRECTORY_NAME = args.model + "_dir"
+DIRECTORY_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY_NAME)
 
 
 # Each experiment you will do will have slightly different results due to the randomness
@@ -79,18 +80,16 @@ def mcheck():
         f.write(SMI_QUERY)
         f.write('\n')
     while True:
-        try:
-            output = subprocess.check_output(SMI_QUERY.split(), stderr=subprocess.STDOUT).decode('utf-8')
-        except subprocess.SubprocessError:
-            print('Error: nvidia-smi not found')
-            break
         with open(logfile, 'a') as f:
+            try:
+                output = subprocess.check_output(SMI_QUERY.split(), stderr=subprocess.STDOUT).decode('utf-8')
+            except:
+                f.write('Error: nvidia-smi not found')
+                break
             f.write(output)
         time.sleep(0.1)
 
 # start memory logging process
-memcheck_process = Process(target = mcheck)
-memcheck_process.start()
 
 # Training loop
 train_time = 0
@@ -102,6 +101,9 @@ for epoch in range(num_epochs):
     # Sets the model in training mode.
     model = model.train()
     start = time.time()
+    #start mem profile
+    memcheck_process = Process(target = mcheck)
+    memcheck_process.start()
     for batch_idx, (images, labels) in enumerate(train_loader):
         # Put the images and labels on the GPU
         images = images.to(device)
@@ -130,6 +132,7 @@ for epoch in range(num_epochs):
                                                                              train_loss / (batch_idx + 1),
                                                                              100. * train_correct / train_total))
     train_time += (time.time() - start)
+    
     #kill memory profiling process
     memcheck_process.terminate()
     memcheck_process.join()
@@ -184,5 +187,7 @@ print("Total FLO: \n", macs * 2)
 print("Total FLOPS: \n", (macs * 2) / start)
 summary(model, (1, 3, 32, 32))
 
+
+
 # Save the PyTorch model in .pt format
-torch.save(model.state_dict(), 'VGG11.pt' if (type(model) == type(VGG11())) else 'VGG16.pt')
+torch.save(model.state_dict(), os.path.join(DIRECTORY_NAME,'VGG11.pt') if (type(model) == type(VGG11())) else os.path.join(DIRECTORY_NAME,'VGG16.pt'))
