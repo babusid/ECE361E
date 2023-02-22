@@ -20,7 +20,7 @@
 \pagebreak
 
 \section*{Problem 1}
-
+\subsection*{Question 2}
 \begin{tabularx}{\textwidth} { 
     | >{\centering\arraybackslash}X 
     | >{\centering\arraybackslash}X 
@@ -38,6 +38,15 @@
     VGG16 & 97.86 & 78.89 & 3622.42 & 14,655,050 & 551954432 & 1425 \\
     \hline
 \end{tabularx}
+\subsection*{Question 3}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{graphing/vgg11_16_acc.pdf}
+    \caption{Test Accuracy of VGG11 and VGG16}
+    \label{fig:accuracy}
+\end{figure}
+
+VGG16 performs better than VGG11 on both train and test. However it has 1.5x the amount of trainable parameters and 1.8x the amount of floating point operations. 
 
 \section*{Problem 2}
 \section*{Problem 3}
