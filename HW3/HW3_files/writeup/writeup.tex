@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[]{mdframed}
+\usepackage{tabularx}
+\usepackage{subfig}
+\usepackage{placeins}
+\usepackage{float}
+
+\graphicspath{ {./images/} }
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+
+
+\author{Sidharth Babu, SNB2593 \and Tianda Huang, TH2678}
+\title{ECE 361E: Homework 3}
+
+\begin{document}
+\begin{mdframed}
+    \maketitle
+\end{mdframed}
+\pagebreak
+
+\section*{Problem 1}
+
+\begin{tabularx}{\textwidth} { 
+    | >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X 
+    | }
+    \hline
+    Model & Training Accuracy(\%) & Test Accuracy (\%) & Total time for training (s) & Number of Trainable Params & Floating Point Operations & GPU memory during training (mb)\\
+    \hline
+    VGG11 & 97.57 & 76.48 & 3011.79 & 9,750,922 & 306587648 & 1215 \\
+    \hline
+    VGG16 & 97.86 & 78.89 & 3622.42 & 14,655,050 & 551954432 & 1425 \\
+    \hline
+\end{tabularx}
+
+\section*{Problem 2}
+\section*{Problem 3}
+
+
+\end{document}
