@@ -1,0 +1,37 @@
+import torch
+from models.vgg11_pt import VGG11
+from models.vgg16_pt import VGG16
+import os
+
+CWD = os.path.dirname(os.path.abspath(__file__))
+
+def convert_onnx(model, input_shape, output_path, opset):
+    output_path = os.path.join(CWD, output_path)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    dummy_input = torch.randn(input_shape)
+    torch.onnx.export(model, dummy_input, output_path, export_params=True, opset_version = opset)
+
+def fmt(dict):
+    '''Remove total_params and total_ops from dict'''
+    dict.pop('total_params')
+    dict.pop('total_ops')
+    return dict
+
+def main():
+    dict11 = torch.load(os.path.join(CWD,'VGG11/VGG11.pt'))
+    dict16 = torch.load(os.path.join(CWD,'VGG16/VGG16.pt'))
+    dict11 = fmt(dict11)
+    dict16 = fmt(dict16)
+
+    vgg11 = VGG11()
+    vgg11.load_state_dict(dict11)
+    vgg16 = VGG16()
+    vgg16.load_state_dict(dict16)
+
+    convert_onnx(vgg11, (1, 3, 32, 32), 'VGG11/VGG11_mc1.onnx', 13)
+    convert_onnx(vgg16, (1, 3, 32, 32), 'VGG16/VGG16_mc1.onnx', 13)
+    convert_onnx(vgg11, (1, 3, 32, 32), 'VGG11/VGG11_rpi.onnx', 17)
+    convert_onnx(vgg16, (1, 3, 32, 32), 'VGG16/VGG16_rpi.onnx', 17)
+
+if __name__ == '__main__':
+    main()
