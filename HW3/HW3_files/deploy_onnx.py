@@ -3,14 +3,18 @@ import onnxruntime
 from tqdm import tqdm
 import os
 from PIL import Image
+import argparse
 
-# TODO: create argument parser object
+parser = argparse.ArgumentParser(description='onnx deployment')
+parser.add_argument('--model', type=str, default='VGG11', help='VGG11, VGG16, or MobileNet-v1')
+parser.add_argument('--path', type=str, default='VGG11_pt.onnx')
+args = parser.parse_args()
 
 # TODO: add one argument for selecting VGG or MobileNet-v1 models
 
 # TODO: Modify the rest of the code to use those arguments correspondingly
 
-onnx_model_name = ""  # TODO: insert ONNX model name, essentially the path to the onnx model
+onnx_model_name = args.path  # TODO: insert ONNX model name, essentially the path to the onnx model
 
 # Create Inference session using ONNX runtime
 sess = onnxruntime.InferenceSession(onnx_model_name)

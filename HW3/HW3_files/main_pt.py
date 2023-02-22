@@ -11,8 +11,10 @@ import subprocess
 from torchinfo import summary
 from models.vgg11_pt import VGG11
 from models.vgg16_pt import VGG16
+from models.mobilenet_pt import MobileNetv1
 
 # Argument parser
+MODELS = ['VGG11', 'VGG16', 'MobileNet-v1']
 parser = argparse.ArgumentParser(description='ECE361E HW3 - Starter PyTorch code')
 # Define the mini-batch size, here the size is 128 images per batch
 parser.add_argument('--batch_size', type=int, default=128, help='Number of samples per mini-batch')
@@ -20,7 +22,7 @@ parser.add_argument('--batch_size', type=int, default=128, help='Number of sampl
 parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train')
 
 #which model to use
-parser.add_argument('--model', type=str, default='VGG11', help='Which model to use (VGG11 or VGG16)')
+parser.add_argument('--model', type=str, default='VGG11', choices=MODELS, help=f'Which model to use ({" or ".join(MODELS)})')
 args = parser.parse_args()
 
 # Always make assignments to local variables from your args at the beginning of your code for better
@@ -53,7 +55,7 @@ train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=bat
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
 # Get chosen model
-model = VGG11() if (args.model == 'VGG11') else VGG16()
+model = {'VGG11':VGG11, 'VGG16':VGG16, 'MobileNet-v1':MobileNetv1}[args.model]()
 
 # Put the model on the GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -169,15 +171,11 @@ for epoch in range(num_epochs):
         f.close()
     torch.save(
         model.state_dict(), 
-        os.path.join(DIRECTORY_NAME,f'VGG11_{epoch}.pt') 
-        if (type(model) == type(VGG11())) else 
-        os.path.join(DIRECTORY_NAME,f'VGG16_{epoch}.pt')
+        os.path.join(DIRECTORY_NAME, f'{args.model}_{epoch}.pt')
     )
     torch.save(
         optimizer.state_dict(),
-        os.path.join(DIRECTORY_NAME,f'VGG11_{epoch}_optimizer.pt')
-        if (type(model) == type(VGG11())) else
-        os.path.join(DIRECTORY_NAME,f'VGG16_{epoch}_optimizer.pt')
+        os.path.join(DIRECTORY_NAME, f'{args.model}_{epoch}_optimizer.pt')
     )
     print(f'Training time: {train_time:.2f} seconds')
 
@@ -200,4 +198,7 @@ summary(model, (1, 3, 32, 32))
 
 
 # Save the PyTorch model in .pt format
-torch.save(model.state_dict(), os.path.join(DIRECTORY_NAME,'VGG11.pt') if (type(model) == type(VGG11())) else os.path.join(DIRECTORY_NAME,'VGG16.pt'))
+torch.save(
+    model.state_dict(), 
+    os.path.join(DIRECTORY_NAME, f'{args.model}.pt')
+)
