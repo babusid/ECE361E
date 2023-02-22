@@ -5,15 +5,15 @@ import os
 from PIL import Image
 import argparse
 
-parser = argparse.ArgumentParser(description='onnx deployment')
-parser.add_argument('--model', type=str, default='VGG11', help='VGG11, VGG16, or MobileNet-v1')
-parser.add_argument('--path', type=str, default='VGG11_pt.onnx')
-args = parser.parse_args()
+# TODO: create argument parser object
+parser = argparse.ArgumentParser(description='ECE361E HW3 - ONNX Deployment')
 
 # TODO: add one argument for selecting VGG or MobileNet-v1 models
+parser.add_argument('--model', type=str, default='vgg11', help='vgg11 or vgg16')
 
 # TODO: Modify the rest of the code to use those arguments correspondingly
 
+args = parser.parse_args()
 onnx_model_name = args.path  # TODO: insert ONNX model name, essentially the path to the onnx model
 
 # Create Inference session using ONNX runtime

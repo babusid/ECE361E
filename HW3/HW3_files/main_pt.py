@@ -171,7 +171,9 @@ for epoch in range(num_epochs):
         f.close()
     torch.save(
         model.state_dict(), 
-        os.path.join(DIRECTORY_NAME, f'{args.model}_{epoch}.pt')
+        os.path.join(DIRECTORY_NAME,f'VGG11_{epoch}.pth') 
+        if (type(model) == type(VGG11())) else 
+        os.path.join(DIRECTORY_NAME,f'VGG16_{epoch}.pth')
     )
     torch.save(
         optimizer.state_dict(),

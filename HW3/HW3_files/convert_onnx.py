@@ -18,8 +18,8 @@ def fmt(dict):
     return dict
 
 def main():
-    dict11 = torch.load(os.path.join(CWD,'VGG11/VGG11.pt'))
-    dict16 = torch.load(os.path.join(CWD,'VGG16/VGG16.pt'))
+    dict11 = torch.load(os.path.join(CWD,'VGG11/VGG11_pt.pth'))
+    dict16 = torch.load(os.path.join(CWD,'VGG16/VGG16_pt.pth'))
     dict11 = fmt(dict11)
     dict16 = fmt(dict16)
 
