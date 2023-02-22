@@ -91,6 +91,8 @@ def mcheck():
 
 # Training loop
 train_time = 0
+memcheck_process = Process(target = mcheck)
+memcheck_process.start()
 for epoch in range(num_epochs):
     # Training phase
     train_correct = 0
@@ -100,8 +102,6 @@ for epoch in range(num_epochs):
     model = model.train()
     start = time.time()
     #start mem profile
-    memcheck_process = Process(target = mcheck)
-    memcheck_process.start()
     for batch_idx, (images, labels) in enumerate(train_loader):
         # Put the images and labels on the GPU
         images = images.to(device)
@@ -131,9 +131,6 @@ for epoch in range(num_epochs):
                                                                              100. * train_correct / train_total))
     train_time += (time.time() - start)
     
-    #kill memory profiling process
-    memcheck_process.terminate()
-    memcheck_process.join()
 
     # Testing phase
     test_correct = 0
@@ -184,6 +181,9 @@ for epoch in range(num_epochs):
     )
     print(f'Training time: {train_time:.2f} seconds')
 
+#kill memory profiling process
+memcheck_process.terminate()
+memcheck_process.join()
 print(f'\nTraining time: {train_time:.2f} seconds')
 print(f'Training accuracy {100. * train_correct / train_total:.2f} %')
 print(f'Test accuracy {100. * test_correct / test_total:.2f} %')
