@@ -1,1 +1,0 @@
-Test acc: 0.7889Test time: 1172.0191826820374 seconds

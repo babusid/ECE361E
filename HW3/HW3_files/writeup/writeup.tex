@@ -59,15 +59,36 @@ The small accuracy boost is not worth the increase in computational complexity, 
     \cline{1-7}
       & MC1 & RaspberryPi & MC1 & RaspberryPi & MC1 & RaspberryPi \\
     \hline
-    VGG11 & 658.23 & 680.61 & 380 & 146 & 76.48 & 76.48\\
+    VGG11 & 658.23 & 680.61 & 477 & 171 & 76.48 & 76.48\\
     \hline
-    VGG16 & 990.92 & 1172.01 & 338 & 174 & 78.89 & 78.89\\
+    VGG16 & 990.92 & 1172.01 & 353 & 192 & 78.89 & 78.89\\
+    \hline
+    MobileNet & 491.65 & 329.29 & 302 & 140 & 77.75 & 77.75\\
     \hline
 \end{tabular}
 \end{center}
 
+\begin{center}
+    \begin{tabular}{|*{3}{c|}}
+        \hline
+        Model & MC1 Total Energy Consumption [J] & RPI total Energy Consumption \\
+        \hline
+        VGG11 & 6574.78 & 3739.29 \\
+        \hline
+        VGG16 & 10106.78 & 6381.64 \\
+        \hline
+        MobileNet & 4196.58 & 1877.44 \\
+        \hline
+    \end{tabular}
+\end{center}
 \subsection*{Question 3}
 \section*{Problem 3}
-
+\subsection*{BONUS}
+The MobileNet model performs the best in terms of composite performance across both platforms.
+It is the most energy efficient model, is the fastest model in terms of inference, and has 
+accuracy on par with the other two models.
+MobileNet's key advantage is the usage of depthwise convolution, which significantly reduces the computation cost of the forward pass on convolutional layers.
+Depthwise convolution works by splitting the convolution operation into two steps. First, a single filter is applied to each input channel, which is followed by a pointwise convolution to combine the output channels into one output.
+This is significantly faster than convolving one learned filter with the entire input tensor. 
 
 \end{document}
