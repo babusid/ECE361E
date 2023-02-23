@@ -71,7 +71,7 @@ test_time = 0
 stop_measurement = mp.Queue()
 filename = args.model + '_power_temperature.csv'
 memcheck_process = Process(target = mcheck)
-measurement_process = mp.Process(target=start_measuring, args=(filename, stop_measurement))
+measurement_process = mp.Process(target=start_measuring, args=(filename, args.target, stop_measurement))
 memcheck_process.start()
 measurement_process.start()
 time.sleep(10)  # idle memory and power usage
