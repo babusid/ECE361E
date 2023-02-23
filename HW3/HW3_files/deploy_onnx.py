@@ -114,5 +114,8 @@ measurement_process.join()
 memcheck_process.terminate()
 memcheck_process.join()
 
-print(f"Test Accuracy: {correct/total}")
-print(f"Test Time: {test_time} seconds")
+with open(f'{args.model}_testmetrics.txt', 'w') as f:
+    f.write(f"Test Accuracy: {correct/total}")
+    f.write(f"Test Time: {test_time} seconds")
+
+
