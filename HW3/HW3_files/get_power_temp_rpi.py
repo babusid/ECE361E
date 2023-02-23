@@ -29,34 +29,35 @@ def get_temps():
 
 
 # solution - writing the temperature, power and cpu usage readings in a csv file 
+class What_Temperature_Do_I_Preheat_My_Oven_To():
 
-parser = argparse.ArgumentParser(description='temperature and power measurement code')
-# added one argument to specify the location of csv file to store the output
-parser.add_argument('--csv_loc', type=str, default='VGG11_readings.csv',
-                    help='csv file to store the temperature and power measurements')
-args = parser.parse_args()
+    def __init__(self, filename, msg_queue):
+        self.fname = filename
+        self.q = msg_queue
 
-with open(args.csv_loc, 'w+') as csv_file:
-    csv_file.write(f"Time stamp,Power,avg_temp\n")
-    # measurement   
-    telnet_connection = tel.Telnet("192.168.4.1")
-    total_power = 0.0
-    start_time = time.time()
+    def run(self):
 
-    while True:
-        last_time = time.time()
+        with open(self.fname, 'w+') as csv_file:
+            csv_file.write(f"Time stamp,Power,avg_temp\n")
+            # measurement   
+            telnet_connection = tel.Telnet("192.168.4.1")
+            total_power = 0.0
+            start_time = time.time()
 
-        # system power
-        total_power = get_telnet_power(telnet_connection, total_power)
-        print('telnet power : ', total_power)
+            while self.q.empty():
+                last_time = time.time()
 
-        # cpu temperature
-        cpu_temp = get_temps()
-        print('cpu temp : ', cpu_temp)
+                # system power
+                total_power = get_telnet_power(telnet_connection, total_power)
+                print('telnet power : ', total_power)
 
-        # writing the readings to the csv file 
-        time_stamp = last_time
-        csv_file.write(f"{time_stamp}, {total_power}, {cpu_temp}\n")
-        elapsed = time.time() - last_time
-        DELAY = 0.2
-        time.sleep(max(0., DELAY - elapsed))
+                # cpu temperature
+                cpu_temp = get_temps()
+                print('cpu temp : ', cpu_temp)
+
+                # writing the readings to the csv file 
+                time_stamp = last_time
+                csv_file.write(f"{time_stamp}, {total_power}, {cpu_temp}\n")
+                elapsed = time.time() - last_time
+                DELAY = 0.2
+                time.sleep(max(0., DELAY - elapsed))

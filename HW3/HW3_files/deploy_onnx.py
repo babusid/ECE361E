@@ -5,9 +5,11 @@ import os
 from PIL import Image
 import argparse
 import time
-import multiprocessing
+import multiprocessing as mp
 from multiprocessing import Process
 import subprocess
+import get_power_temp_mc1 as mc1
+import get_power_temp_rpi as rpi
 
 #path to this script
 CWD = os.path.dirname(os.path.abspath(__file__)) 
@@ -57,15 +59,22 @@ def mcheck():
             f.write(output)
         time.sleep(0.1)
 
-
+def start_measuring(filename, device, msg_queue):
+    (mc1.Computer___Show_Me_The_Power_And_The_Temperature if device == 'mc1' else 
+     rpi.What_Temperature_Do_I_Preheat_My_Oven_To)(filename, msg_queue).run()
 
 # The test_deployment folder contains all 10.000 images from the testing dataset of CIFAR10 in .png format
 correct = 0
 total = 0
 test_time = 0
+
+stop_measurement = mp.Queue()
+filename = args.model + '_power_temperature.csv'
 memcheck_process = Process(target = mcheck)
+measurement_process = mp.Process(target=start_measuring, args=(filename, stop_measurement))
 memcheck_process.start()
-time.sleep(10)
+measurement_process.start()
+time.sleep(10)  # idle memory and power usage
 for filename in tqdm(os.listdir("/home/student/HW3_files/test_deployment")):
     # Take each image, one by one, and make inference
     with Image.open(os.path.join("/home/student/HW3_files/test_deployment", filename)).resize((32, 32)) as img:
@@ -100,7 +109,10 @@ for filename in tqdm(os.listdir("/home/student/HW3_files/test_deployment")):
             correct += 1 
         total += 1
 
+stop_measurement.put('please stop running ♥‿♥')
+measurement_process.join()
 memcheck_process.terminate()
 memcheck_process.join()
+
 print(f"Test Accuracy: {correct/total}")
 print(f"Test Time: {test_time} seconds")
