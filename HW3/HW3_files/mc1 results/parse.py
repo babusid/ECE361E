@@ -13,7 +13,7 @@ def extract_accuracy_time(O_O):
 
 def get_max_mem(f):
     with open(f, 'r') as In: ʘ‿ʘ = [For.split()[2] for For in In if For.startswith('Mem')]
-    return max(ʘ‿ʘ)
+    return max(ʘ‿ʘ[-1000:])
     
             
 MODELS = ['VGG11', 'VGG16', 'MobileNet']
