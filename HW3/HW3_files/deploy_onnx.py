@@ -4,6 +4,10 @@ from tqdm import tqdm
 import os
 from PIL import Image
 import argparse
+import time
+import multiprocessing
+from multiprocessing import Process
+import subprocess
 
 #path to this script
 CWD = os.path.dirname(os.path.abspath(__file__)) 
@@ -11,17 +15,17 @@ CWD = os.path.dirname(os.path.abspath(__file__))
 # create argument parser object
 parser = argparse.ArgumentParser(description='ECE361E HW3 - ONNX Deployment')
 
-#  add one argument for selecting VGG or MobileNet-v1 models
-parser.add_argument('--model', type=str, default='VGG11', help='VGG11 or VGG16')
+#  Add one argument for selecting VGG or MobileNet-v1 models
+parser.add_argument('--model', type=str, default='VGG11', help='VGG11 or VGG16 or MobileNet')
+parser.add_argument('--target', type=str, default='rpi', help='rpi or mc1')
+
 args = parser.parse_args()
 
-# TODO: Modify the rest of the code to use those arguments correspondingly
-
-
-onnx_model_name = args.model  
+# Modify the rest of the code to use those arguments correspondingly
+onnx_path = os.path.join(CWD, args.model, f'{args.model}_{args.target}.onnx')
 
 # Create Inference session using ONNX runtime
-sess = onnxruntime.InferenceSession(onnx_model_name)
+sess = onnxruntime.InferenceSession(onnx_path)
 
 # Get the input name for the ONNX model
 input_name = sess.get_inputs()[0].name
@@ -38,7 +42,30 @@ std = np.array((0.2023, 0.1994, 0.2010))
 # Label names for CIFAR10 Dataset
 label_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
+def mcheck():
+
+    logfile = os.path.join(CWD, f'test_RAM_{args.model}.txt')
+    os.makedirs(os.path.dirname(logfile), exist_ok=True)
+
+    while True:
+        with open(logfile, 'a') as f:
+            try:
+                output = subprocess.check_output('free -m'.split(), stderr=subprocess.STDOUT).decode('utf-8')
+            except:
+                f.write('poop fart')
+                break
+            f.write(output)
+        time.sleep(0.1)
+
+
+
 # The test_deployment folder contains all 10.000 images from the testing dataset of CIFAR10 in .png format
+correct = 0
+total = 0
+test_time = 0
+memcheck_process = Process(target = mcheck)
+memcheck_process.start()
+time.sleep(10)
 for filename in tqdm(os.listdir("/home/student/HW3_files/test_deployment")):
     # Take each image, one by one, and make inference
     with Image.open(os.path.join("/home/student/HW3_files/test_deployment", filename)).resize((32, 32)) as img:
@@ -56,7 +83,9 @@ for filename in tqdm(os.listdir("/home/student/HW3_files/test_deployment")):
         print("Input Image shape:", input_image.shape)
 
         # Run inference and get the prediction for the input image
+        start = time.time()
         pred_onnx = sess.run(None, {input_name: input_image})[0]
+        test_time += time.time()-start
 
         # Find the prediction with the highest probability
         top_prediction = np.argmax(pred_onnx[0])
@@ -65,4 +94,13 @@ for filename in tqdm(os.listdir("/home/student/HW3_files/test_deployment")):
         pred_class = label_names[top_prediction]
 
         # TODO: compute test accuracy of the model 
+        true_label = os.path.splitext(filename)[0].split('_')[1]
 
+        if pred_class == true_label: 
+            correct += 1 
+        total += 1
+
+memcheck_process.terminate()
+memcheck_process.join()
+print(f"Test Accuracy: {correct/total}")
+print(f"Test Time: {test_time} seconds")
