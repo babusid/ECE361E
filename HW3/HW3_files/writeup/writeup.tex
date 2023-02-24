@@ -33,16 +33,18 @@
     \hline
     Model & Training Accuracy(\%) & Test Accuracy (\%) & Total time for training (s) & Number of Trainable Params & Floating Point Operations & GPU memory during training (mb)\\
     \hline
-    VGG11 & 97.57 & 76.48 & 3011.79 & 9,750,922 & 306587648 & 1215 \\
+    VGG11 & 97.57 & 76.48 & 3011.79 & 9,750,922 & 306,587,648 & 2583 \\
     \hline
-    VGG16 & 97.86 & 78.89 & 3622.42 & 14,655,050 & 551954432 & 1425 \\
+    VGG16 & 97.86 & 78.89 & 3622.42 & 14,655,050 & 551,954,432 & 2583 \\
+    \hline
+    MobileNet & 99.42 & 77.75 & 2211.56 & 3,217,226 & 96,002,048 & 1151\\
     \hline
 \end{tabularx}
 
 \subsection*{Question 3}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{graphing/vgg11_16_acc.pdf}
+    \includegraphics[width=\textwidth]{graphing/vgg11_16_acc.pdf}
     \caption{Test Accuracy of VGG11 and VGG16}
     \label{fig:accuracy}
 \end{figure}
@@ -59,11 +61,11 @@ The small accuracy boost is not worth the increase in computational complexity, 
     \cline{1-7}
       & MC1 & RaspberryPi & MC1 & RaspberryPi & MC1 & RaspberryPi \\
     \hline
-    VGG11 & 658.23 & 680.61 & 477 & 171 & 76.48 & 76.48\\
+    VGG11 & 658.23 & 680.61 & 330 & 171 & 76.48 & 76.48\\
     \hline
-    VGG16 & 990.92 & 1172.01 & 353 & 192 & 78.89 & 78.89\\
+    VGG16 & 990.92 & 1172.02 & 352 & 192 & 78.89 & 78.89\\
     \hline
-    MobileNet & 491.65 & 329.29 & 302 & 140 & 77.75 & 77.75\\
+    MobileNet & 491.65 & 329.30 & 302 & 139 & 77.75 & 77.75\\
     \hline
 \end{tabular}
 \end{center}
@@ -73,11 +75,11 @@ The small accuracy boost is not worth the increase in computational complexity, 
         \hline
         Model & MC1 Total Energy Consumption [J] & RPI total Energy Consumption \\
         \hline
-        VGG11 & 6574.78 & 3739.29 \\
+        VGG11 & 6574.78 & 3739.40 \\
         \hline
-        VGG16 & 10106.78 & 6381.64 \\
+        VGG16 & 10106.79 & 6381.64 \\
         \hline
-        MobileNet & 4196.58 & 1877.44 \\
+        MobileNet & 4196.58 & 1877.45 \\
         \hline
     \end{tabular}
 \end{center}
