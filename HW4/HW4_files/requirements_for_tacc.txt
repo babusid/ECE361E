@@ -31,7 +31,6 @@ tensorboard-plugin-wit==1.8.1
 tensorflow-estimator==2.4.0
 tensorflow-gpu==2.4.0
 termcolor==1.1.0
-tflite-runtime==2.7.0
 tqdm==4.64.1
 typing-extensions==3.7.4.3
 urllib3==1.26.14
