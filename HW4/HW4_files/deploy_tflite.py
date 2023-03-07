@@ -39,7 +39,7 @@ def start_measuring(filename, device, msg_queue):
 
 # Modify the rest of the code to use the arguments correspondingly
 # Path to your tflite model
-tflite_model_name = os.path.join(CWD, args.model, f'{args.model}_saved_model')
+tflite_model_name = os.path.join(CWD, args.model, f'{args.model}.tflite')
 # Path to test dataset
 test_file_dir = '/home/student/HW4_files/test_deployment'  
 
