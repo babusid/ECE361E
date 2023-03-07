@@ -95,5 +95,5 @@ print(f'INFO: Test Accuracy: {test_acc}')
 
 # Save the weights of the model in .ckpt format
 pickle.dump(history.history, open(full_fname('_history.p'), 'wb'))
-model.save(full_fname('.ckpt'))
+model.save_weights(full_fname('.ckpt'))
 
