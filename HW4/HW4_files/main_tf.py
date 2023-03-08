@@ -75,7 +75,7 @@ else:
     lr = 1e-3
 
 # Configures the model for training using compile method
-model.compile(optimizer='adam',
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
               loss=tf.keras.losses.CategoricalCrossentropy(),
               metrics=['accuracy'])
 
@@ -84,16 +84,18 @@ start_time = time.time()
 history = model.fit(train_norm, train_label_onehot, 
                     batch_size=args.batch_size,
                     epochs=args.epochs,
+                    validation_data=(test_norm, test_label_onehot),
                     verbose=2)
 print(f'INFO: Training Time: {(time.time()-start_time):.3f} seconds')
                     
 test_loss, test_acc = model.evaluate(test_norm, test_label_onehot,
-                      batch_size = args.batch_size,
+                      batch_size=args.batch_size,
                       verbose=2)
 print(f'INFO: Test Loss: {test_loss}')
 print(f'INFO: Test Accuracy: {test_acc}')
 
 # Save the weights of the model in .ckpt format
 pickle.dump(history.history, open(full_fname('_history.p'), 'wb'))
-model.save_weights(full_fname('.ckpt'))
+model.save(full_fname('_saved_model'))
+# model.save_weights(full_fname('.ckpt'))
 
