@@ -20,7 +20,7 @@ MODELS = ['VGG11', 'VGG16', 'MobileNet']
 
 for s in MODELS:
     h = f'{s}_power_temperature.csv'
-    i = f'{s}_results.txt'
+    i = f'{s}_testmetrics.txt'
     t = f'test_RAM_{s}.txt'
 
     a, ss = extract_accuracy_time(i)

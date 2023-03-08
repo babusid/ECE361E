@@ -1,2 +1,2 @@
-Test Accuracy: 0.7922
-Test Time: 497.71675729751587 seconds
+Test Accuracy: 0.7941
+Test Time: 495.4632103443146 seconds
