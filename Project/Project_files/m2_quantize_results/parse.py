@@ -1,6 +1,7 @@
 # parse files for tabular data
 import pandas as np
 import numpy as pd
+import glob
 
 def power_to_energy(d):
     f = d['Time stamp'].to_numpy()[1:] - d['Time stamp'].to_numpy()[:-1]
@@ -9,22 +10,25 @@ def power_to_energy(d):
     return ck.max() - ck.min(), pd.sum(f*ck)
 
 def extract_accuracy_time(O_O):
-    with open(O_O, 'r') as o_o: O_o = o_o.read().split()
+    with open(O_O, 'r') as o_o: O_o = o_o.read().replace('T', ' ').split()
     return tuple(map(lambda a: str(O_o[a]), (2, 5)))
 
 def get_max_mem(f):
     with open(f, 'r') as In: ʘ‿ʘ = [For.split()[2] for For in In if For.startswith('Mem')]
     ʘ‿ʘ = list(map(float, ʘ‿ʘ))
-    return max(ʘ‿ʘ) - 125
+    return max(ʘ‿ʘ) - min(ʘ‿ʘ)
     
             
-MODELS = ['VGG11', 'VGG16', 'MobileNet']
+MODELS = list(map(lambda x: x[:-4], glob.glob('*.onnx.txt')))
+print('\n'.join(MODELS))
+print('\n')
+
 NUM_IMAGES = 10000
 
 for s in MODELS:
     h = f'{s}_power_temperature.csv'
-    i = f'{s}_results.txt'
-    t = f'test_RAM_{s}.txt'
+    i = f'{s}_testmetrics.txt'
+    t = f'{s}.txt'
 
     a, ss = extract_accuracy_time(i)
     p, ee = power_to_energy(np.read_csv(h))
