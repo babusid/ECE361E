@@ -1,6 +1,4 @@
 HW1_virtualenv/
-*.e*
-*.o*
 data/
 starter/
 simpleFC*/
