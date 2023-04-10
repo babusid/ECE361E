@@ -11,17 +11,19 @@ from set_seed import set_random_seed
 
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('onnx_model', required=True, type=str, nargs='+',
+parser.add_argument('onnx_model', type=str, nargs='+',
                     help='Path of FLOAT ONNX model(s) [FLOAT ONLY!]')
 args = parser.parse_args()
 
 set_random_seed(233)
 
 input_models = [f for g in map(glob.glob, args.onnx_model) for f in g]
+print(input_models)
 
 for input_onnx in input_models:
     infer_path = input_onnx.replace('.onnx', '_infer.onnx')
     output_path = input_onnx.replace('.onnx', '_int8.onnx')
+    print(input_onnx, infer_path, output_path)
 
     tds = CIFAR10(root='data', train=True, transform=transforms.Compose([
         transforms.ToTensor(),
