@@ -7,7 +7,7 @@ from torch.nn import ReLU6
 class Bottleneck(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1, expansion_constant=6):
         super(Bottleneck, self).__init__()
-
+        self.stride = stride
         #Expansion stage, 1x1 convolution
         self.conv1 = nn.Conv2d(in_channels, expansion_constant*in_channels, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn1 = nn.BatchNorm2d(expansion_constant*in_channels)
@@ -23,8 +23,8 @@ class Bottleneck(nn.Module):
         self.bn3 = nn.BatchNorm2d(out_channels)
 
         #Skip connection pointwise convolution
-        self.conv4 = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0, bias=False)
-
+        if (self.stride == 1):
+            self.conv4 = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0, bias=False)
     def forward(self, x: torch.Tensor):
         #1. Expand the input channels to expansion times the input channels
         #2. Batchnorm
@@ -47,8 +47,8 @@ class Bottleneck(nn.Module):
 
         x = self.conv3(x)
         x = self.bn3(x)
-
-        x += self.conv4(residual)
+        if(self.stride == 1):
+            x += self.conv4(residual)
 
 
 class MobileNetv2(nn.Module):
