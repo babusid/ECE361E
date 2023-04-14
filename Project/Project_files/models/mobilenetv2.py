@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import ReLU6, ReLU
+import torch.functional as F
 
 
 
@@ -25,7 +26,7 @@ class Bottleneck(nn.Module):
         #Skip connection pointwise convolution
         if (self.stride == 1):
             self.conv4 = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0, bias=False)
-    def forward(self, x: torch.Tensor):
+    def forward(self, x):
         #1. Expand the input channels to expansion times the input channels
         #2. Batchnorm
         #3. ReLU6
@@ -37,6 +38,7 @@ class Bottleneck(nn.Module):
         #9. Skip Connection (1x1 convolution with stride = stride and padding = 0, kernel size = 1)
         
         residual = x
+        
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu1(x)
@@ -49,6 +51,7 @@ class Bottleneck(nn.Module):
         x = self.bn3(x)
         if(self.stride == 1):
             x += self.conv4(residual)
+        return x
 
 
 class MobileNetv2(nn.Module):
@@ -77,14 +80,11 @@ class MobileNetv2(nn.Module):
         super(MobileNetv2, self).__init__()
         self.conv1 = nn.Conv2d(3,32, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(32)
-        self.relu1 = ReLU6()
-
+        self.relu1 = ReLU()
         self.layers = self._make_layers(in_planes=32)
-        
         self.conv2 = nn.Conv2d(320, 1280, kernel_size=1, stride=1, padding=0, bias=False)
-        self.avgpool = nn.AvgPool2d((7,7))
-        self.conv3 = nn.Conv2d(1280, 1280, kernel_size=1, stride=1, padding=0, bias=False)
-        
+        self.avgpool = nn.AvgPool2d((2,2))
+        self.conv3 = nn.Conv2d(1280, num_classes, kernel_size=1, stride=1, padding=0, bias=False)
         self.linear = nn.Linear(1280, num_classes)
     
     def _make_layers(self, in_planes):
@@ -95,6 +95,8 @@ class MobileNetv2(nn.Module):
             expansion = x[2]
             layers.append(Bottleneck(in_planes, out_planes, stride, expansion))
             in_planes = out_planes
+        
+        # return layers
         return nn.Sequential(*layers)
 
     def forward(self, x):
@@ -108,3 +110,11 @@ class MobileNetv2(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.linear(out)
         return out
+    
+if __name__ == '__main__':
+    m = MobileNetv2()
+    print(m)
+
+    dummy = torch.rand((128, 3, 32, 32))
+    out = m(dummy)
+    print(out)
