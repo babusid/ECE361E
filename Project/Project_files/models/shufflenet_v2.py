@@ -68,8 +68,8 @@ class InvertedResidual(nn.Module):
 
 
 class ShuffleNetV2(nn.Module):
-    stage_cfg = [3, 7, 3]   # repeats per stage
-    output_channels = [24, 48, 96, 192, 1024]   # 0.5x multiplier
+    stage_cfg = [1, 1, 1]   # repeats per stage
+    output_channels = [12, 24, 48, 48, 128]   # 0.5x multiplier
 
     def __init__(self, input_size=32, num_classes=10):
         super(ShuffleNetV2, self).__init__()
