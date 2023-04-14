@@ -47,7 +47,7 @@ class MobileNetv1(nn.Module):
         x = self.relu1(self.bn1(self.conv1(x)))
         x = self.layers(x)
         x = F.avg_pool2d(x, 2)
-        x = x.view(x.size(0), -1)
+        x = x.view(1, -1)
         x = self.linear(x)
         x = self.dequant(x)
         return x
