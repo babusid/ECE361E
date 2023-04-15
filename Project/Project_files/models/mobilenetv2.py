@@ -38,7 +38,6 @@ class Bottleneck(nn.Module):
         #9. Skip Connection (1x1 convolution with stride = stride and padding = 0, kernel size = 1)
         
         residual = x
-        
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu1(x)
@@ -62,17 +61,17 @@ class MobileNetv2(nn.Module):
         (24,2,6),
         (24,1,6),
         (32,2,6),
-        (32,1,6),
+        (32,1,6), 
         (32,1,6),
         (64,2,6),
-        (64,1,6),
-        (64,1,6),
+        (64,1,6), 
+        (64,1,6), 
         (64,1,6),
         (96,1,6),
-        (96,1,6),
-        (96,1,6),
+        (96,1,6), 
+        (96,1,6), 
         (160,2,6),
-        (160,1,6),
+        (160,1,6), 
         (160,1,6),
         (320,1,6),
     ]
@@ -84,7 +83,7 @@ class MobileNetv2(nn.Module):
         self.layers = self._make_layers(in_planes=32)
         self.conv2 = nn.Conv2d(320, 1280, kernel_size=1, stride=1, padding=0, bias=False)
         self.avgpool = nn.AvgPool2d((2,2))
-        self.conv3 = nn.Conv2d(1280, num_classes, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv3 = nn.Conv2d(1280, 1280, kernel_size=1, stride=1, padding=0, bias=False)
         self.linear = nn.Linear(1280, num_classes)
     
     def _make_layers(self, in_planes):
@@ -102,19 +101,32 @@ class MobileNetv2(nn.Module):
     def forward(self, x):
         out = self.conv1(x)
         out = self.bn1(out)
-        out = self.relu1(out)
+        
+        out = self.relu1(out)      
+        
         out = self.layers(out)
+        
         out = self.conv2(out)
+        
         out = self.avgpool(out)
-        out = self.conv3(out)
+        
+        out = self.conv3(out) 
+        
         out = out.view(out.size(0), -1)
+        
         out = self.linear(out)
+        
         return out
     
 if __name__ == '__main__':
     m = MobileNetv2()
     print(m)
+    model_parameters = filter(lambda p: p.requires_grad, m.parameters())
+
+    import numpy as np
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print(params)
 
     dummy = torch.rand((128, 3, 32, 32))
     out = m(dummy)
-    print(out)
+    # print(out)
