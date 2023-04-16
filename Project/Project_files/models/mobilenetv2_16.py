@@ -59,33 +59,33 @@ class MobileNetv2(nn.Module):
     #Transcribed from Table 2 of Mobilenetv2 paper
     cfg = [
         (16,1,1),
-        (24,2,6),
-        (24,1,6),
-        (32,2,6),
+        (24,2,5),
+        (24,1,5),
+        (32,2,5),
         # (32,1,6), # Comment out for: -6
-        (32,1,6),
+        # (32,1,6),
         # (64,2,6),
         # (64,1,6), # Comment out for: -6
         # (64,1,6), # Comment out for: -6
-        (64,1,6),
+        # (64,1,6),
         # (96,1,6),
         # (96,1,6), # Comment out for: -6
         # (96,1,6), # Comment out for: -6
         # (160,2,6),
         # (160,1,6), # Comment out for: -6
-        (160,1,6),
+        # (160,1,6),
         # (320,1,6),
     ]
     def __init__(self, num_classes=10):
         super(MobileNetv2, self).__init__()
         self.conv1 = nn.Conv2d(3,32, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(32)
-        self.relu1 = ReLU()
+        # self.relu1 = ReLU()
         self.layers = self._make_layers(in_planes=32)
         # self.conv2 = nn.Conv2d(320, 1280, kernel_size=1, stride=1, padding=0, bias=False)
         self.avgpool = nn.AvgPool2d((2,2))
         # self.conv3 = nn.Conv2d(1280, 1280, kernel_size=1, stride=1, padding=0, bias=False)
-        self.linear = nn.Linear(160*4*4, num_classes)
+        self.linear = nn.Linear(32*4*4, num_classes)
     
     def _make_layers(self, in_planes):
         layers = []
@@ -103,7 +103,7 @@ class MobileNetv2(nn.Module):
         out = self.conv1(x)
         out = self.bn1(out)
         
-        out = self.relu1(out)      
+        # out = self.relu1(out)      
         
         out = self.layers(out)
         
@@ -122,10 +122,9 @@ class MobileNetv2(nn.Module):
 if __name__ == '__main__':
     m = MobileNetv2()
     print(m)
-
-
     from torchinfo import summary
     summary(m, input_size=(128, 3, 32, 32))
+
 
     dummy = torch.rand((128, 3, 32, 32))
     out = m(dummy)
