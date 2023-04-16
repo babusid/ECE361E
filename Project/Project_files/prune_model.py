@@ -7,6 +7,7 @@ import torch_pruning as tp
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 from set_seed import set_random_seed
+import numpy as np
 
 
 # Argument parser
@@ -62,6 +63,15 @@ test_loader = torch.utils.data.DataLoader(
 criterion = nn.CrossEntropyLoss()  # Softmax is internally computed.
 criterion = criterion.to(torch.device('cuda:0'))
 optimizer = torch.optim.Adam(model.parameters())
+
+def summary(model):
+    total_param_list = [p for p in model.parameters()]
+    trainable_param_list = [p for p in model.parameters() if p.requires_grad]
+    num_trainable_params = 0
+    for param in trainable_param_list:
+        num_trainable_params += np.prod(param.cpu().data.numpy().shape)
+    print('Total number of trainable parameters : %d\n' % num_trainable_params)
+
 
 
 def fine_tune(model):
@@ -157,8 +167,8 @@ def prune_network(model, metric, prune_ratio, iterative_steps=5, fine_tune_epoch
             fine_tune(model)
         print('Iteration {} out of {}; After fine-tuning'.format(i+1, iterative_steps))
         test(model)
-        print(model)
-
+        # print(model)
+        summary(model)
     os.makedirs("./onnx_model", exist_ok=True)
     torch.onnx.export(model.to('cpu'),
                       torch.zeros((1, 3, 32, 32)),
@@ -170,13 +180,19 @@ def prune_network(model, metric, prune_ratio, iterative_steps=5, fine_tune_epoch
 
 print('Accuracy without pruning')
 test(model)
-print(model)
+torch.onnx.export(model.to('cpu'),
+                      torch.zeros((1, 3, 32, 32)),
+                      'onnx_model/{}_non_pruned_net.onnx'.format(
+                          args.model),
+                      input_names=['input'], opset_version=13)
+
+
 
 for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]:
     model = MobileNetv1()
     model.load_state_dict(ckpt)
     print('Before pruning:')
     test(model)
-    print(model)
+    summary(model)
     print(f'Pruning Ratio: {i}')
     prune_network(model, args.prune_metric, i, args.iter_steps, args.finetune_epoch)

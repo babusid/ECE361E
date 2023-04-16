@@ -1,0 +1,14 @@
+['./onnxs/mobilenetv2_0.onnx']
+./onnxs/mobilenetv2_0.onnx ./onnxs/mobilenetv2_0_infer.onnx ./onnxs/mobilenetv2_0_int8.onnx
+Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to data/cifar-10-python.tar.gz
+Extracting data/cifar-10-python.tar.gz to data
+100
+200
+300
+400
+500
+600
+700
+800
+900
+1000
