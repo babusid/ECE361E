@@ -1,0 +1,13 @@
+['./onnxs/mobilenetv2_13.onnx']
+./onnxs/mobilenetv2_13.onnx ./onnxs/mobilenetv2_13_infer.onnx ./onnxs/mobilenetv2_13_int8.onnx
+Files already downloaded and verified
+100
+200
+300
+400
+500
+600
+700
+800
+900
+1000
