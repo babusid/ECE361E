@@ -25,7 +25,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/apps/cuda/11.3/lib64
 source $WORK/virtualenv/bin/activate
 cd $WORK/ECE361E/Project/Project_files/mobilenetv2_experiments
 mkdir "ckpt"
-python $WORK/ECE361E/Project/Project_demo/quantize_onnx.py onnx_model "./onnxs/mobilenetv2_16.onnx" > ./onnxs/mnet2_16_q.txt 2> ./onnxs/mnet_2_16_q.err.txt
+python $WORK/ECE361E/Project/Project_demo/quantize_onnx.py onnx_model "./onnxs/mobilenetv2_19_5.onnx" > ./onnxs/mnet2_19_5_q.txt 2> ./onnxs/mnet2_19_5_q.err.txt
 
 
 # Launch code...
