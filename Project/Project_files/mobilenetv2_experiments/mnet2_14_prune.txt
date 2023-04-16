@@ -1,0 +1,280 @@
+Files already downloaded and verified
+Accuracy without pruning
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.05
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 2.0637 Test accuracy: 70.61 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 2.1577 Test accuracy: 69.76 %
+
+Total number of trainable parameters : 46886
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 2.2079 Test accuracy: 68.53 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 2.2576 Test accuracy: 68.58 %
+
+Total number of trainable parameters : 46559
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 2.7140 Test accuracy: 64.78 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 2.3813 Test accuracy: 67.31 %
+
+Total number of trainable parameters : 46106
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 2.4021 Test accuracy: 65.18 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 2.4073 Test accuracy: 65.60 %
+
+Total number of trainable parameters : 44915
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 3.0983 Test accuracy: 58.60 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 2.5486 Test accuracy: 64.09 %
+
+Total number of trainable parameters : 43920
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.1
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 1.9502 Test accuracy: 71.19 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 2.2731 Test accuracy: 68.62 %
+
+Total number of trainable parameters : 46559
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 2.5541 Test accuracy: 63.48 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 2.3968 Test accuracy: 66.11 %
+
+Total number of trainable parameters : 44915
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 3.1092 Test accuracy: 57.96 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 2.5436 Test accuracy: 64.19 %
+
+Total number of trainable parameters : 43602
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 3.1230 Test accuracy: 55.83 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 2.7018 Test accuracy: 61.43 %
+
+Total number of trainable parameters : 41858
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 2.9318 Test accuracy: 57.16 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 2.8894 Test accuracy: 58.98 %
+
+Total number of trainable parameters : 39772
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.2
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 2.2103 Test accuracy: 66.68 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 2.4317 Test accuracy: 65.82 %
+
+Total number of trainable parameters : 44915
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 3.7937 Test accuracy: 49.60 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 2.8228 Test accuracy: 60.16 %
+
+Total number of trainable parameters : 41858
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 4.8939 Test accuracy: 42.13 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 3.1249 Test accuracy: 55.94 %
+
+Total number of trainable parameters : 39049
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 5.1097 Test accuracy: 36.15 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 3.5658 Test accuracy: 49.54 %
+
+Total number of trainable parameters : 35485
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 4.6083 Test accuracy: 39.87 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 3.8465 Test accuracy: 44.72 %
+
+Total number of trainable parameters : 32874
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.3
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 2.7975 Test accuracy: 60.06 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 2.5853 Test accuracy: 63.35 %
+
+Total number of trainable parameters : 43602
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 4.3096 Test accuracy: 44.23 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 2.9538 Test accuracy: 57.11 %
+
+Total number of trainable parameters : 39049
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 5.5444 Test accuracy: 35.33 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 3.3917 Test accuracy: 50.04 %
+
+Total number of trainable parameters : 34434
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 6.9743 Test accuracy: 28.99 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 4.0995 Test accuracy: 40.99 %
+
+Total number of trainable parameters : 30379
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 6.5754 Test accuracy: 22.30 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 5.1123 Test accuracy: 33.31 %
+
+Total number of trainable parameters : 26254
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.4
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 3.0561 Test accuracy: 55.36 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 2.7646 Test accuracy: 60.67 %
+
+Total number of trainable parameters : 41858
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 7.4628 Test accuracy: 29.74 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 3.5275 Test accuracy: 49.88 %
+
+Total number of trainable parameters : 35485
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 6.3235 Test accuracy: 26.57 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 4.5655 Test accuracy: 39.50 %
+
+Total number of trainable parameters : 30379
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 8.0929 Test accuracy: 21.01 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 5.2536 Test accuracy: 30.22 %
+
+Total number of trainable parameters : 24878
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 6.5692 Test accuracy: 17.82 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 6.3523 Test accuracy: 21.21 %
+
+Total number of trainable parameters : 20657
+
+Before pruning:
+Test loss: 1.7043 Test accuracy: 75.98 %
+
+Total number of trainable parameters : 48970
+
+Pruning Ratio: 0.5
+Iteration 1 out of 5; Before fine-tuning
+Test loss: 4.8439 Test accuracy: 41.19 %
+
+Iteration 1 out of 5; After fine-tuning
+Test loss: 3.1244 Test accuracy: 56.10 %
+
+Total number of trainable parameters : 39772
+
+Iteration 2 out of 5; Before fine-tuning
+Test loss: 6.7647 Test accuracy: 24.47 %
+
+Iteration 2 out of 5; After fine-tuning
+Test loss: 4.7114 Test accuracy: 39.35 %
+
+Total number of trainable parameters : 32874
+
+Iteration 3 out of 5; Before fine-tuning
+Test loss: 9.1553 Test accuracy: 17.18 %
+
+Iteration 3 out of 5; After fine-tuning
+Test loss: 5.3162 Test accuracy: 30.41 %
+
+Total number of trainable parameters : 26254
+
+Iteration 4 out of 5; Before fine-tuning
+Test loss: 10.3132 Test accuracy: 15.90 %
+
+Iteration 4 out of 5; After fine-tuning
+Test loss: 5.8043 Test accuracy: 22.27 %
+
+Total number of trainable parameters : 20657
+
+Iteration 5 out of 5; Before fine-tuning
+Test loss: 7.1134 Test accuracy: 13.45 %
+
+Iteration 5 out of 5; After fine-tuning
+Test loss: 5.4387 Test accuracy: 20.07 %
+
+Total number of trainable parameters : 15802
+
