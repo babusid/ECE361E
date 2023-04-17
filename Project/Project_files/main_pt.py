@@ -5,8 +5,23 @@ import torchvision.transforms as transforms
 import argparse
 import time
 import numpy as np
+import os
 
-from models.mobilenet_pt import MobileNetv1
+# from models.mobilenet_pt import MobileNetv1
+# from models.mobilenetv2 import MobileNetv2
+# from models.mobilenetv2_8 import MobileNetv2
+# from models.mobilenetv2_12 import MobileNetv2
+# from models.mobilenetv2_13 import MobileNetv2
+# from models.mobilenetv2_14 import MobileNetv2
+# from models.mobilenetv2_15 import MobileNetv2
+# from models.mobilenetv2_16 import MobileNetv2
+# from models.mobilenetv2_16_r import MobileNetv2
+# from models.mobilenetv2_17 import MobileNetv2
+# from models.mobilenetv2_17_r import MobileNetv2
+# from models.mobilenetv2_18 import MobileNetv2
+# from models.mobilenetv2_19_4 import MobileNetv2
+from models.mobilenetv2_19_4_stem import MobileNetv2
+
 from set_seed import set_random_seed
 
 # Argument parser
@@ -45,8 +60,8 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch
 model = None
 model_str = ""
 
-model = MobileNetv1()
-model_str = "mobilenetv1"
+model = MobileNetv2()
+model_str = "mobilenetv2_19_4_stem"
 
 # Put the model on the GPU
 device = torch.device('cuda')
@@ -132,7 +147,8 @@ for epoch in range(num_epochs):
     test_acc_list.append(100. * test_correct / test_total)
 
     # Save the PyTorch model in .pt format
-    path = f'ckpt/{model_str}.pt'
+    os.makedirs(f'ckpt/{model_str}/', exist_ok=True)
+    path = f'ckpt/{model_str}/{model_str}_{epoch}.pt'
     torch.save(model.state_dict(), path)
 
 
@@ -140,6 +156,11 @@ with open(f'{model_str}.csv', 'w+') as csv_file:
     csv_file.write(f"Epoch,Train acc,Train loss,Test acc,Test loss\n")
     for epoch in range(num_epochs):
         csv_file.write(f"{epoch},{train_acc_list[epoch]},{train_loss_list[epoch]},{test_acc_list[epoch]},{test_loss_list[epoch]}\n")
+
+# torch.onnx.export(model.to('cpu'),
+#                       torch.zeros((1, 3, 32, 32)),
+#                       f'./mobilenetv2_experiments/onnxs/{model_str}.onnx',
+#                       input_names=['input'], opset_version=13)
 
 total_param_list = [p for p in model.parameters()]
 trainable_param_list = [p for p in model.parameters() if p.requires_grad]
