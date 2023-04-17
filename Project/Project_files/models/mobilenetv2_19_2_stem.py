@@ -59,8 +59,8 @@ class MobileNetv2(nn.Module):
     #Transcribed from Table 2 of Mobilenetv2 paper
     cfg = [
         (12,2,1),
-        (12,2,4),
-        (12,2,4),
+        (12,2,2),
+        (12,2,2),
         # (32,2,5),
         # (32,1,6), 
         # (32,1,6),
