@@ -4,9 +4,9 @@
 #   for TACC Maverick2 GTX nodes
 #----------------------------------------------------
 
-#SBATCH -J Proj_gr0                        # Job name
-#SBATCH -o Proj_gr0.o%j                    # Name of stdout output file (%j corresponds to the job id)
-#SBATCH -e Proj_gr0.e%j                    # Name of stderr error file (%j corresponds to the job id)
+#SBATCH -J m2-19-4-s                       # Job name
+#SBATCH -o m2-19-4-s.o%j                    # Name of stdout output file (%j corresponds to the job id)
+#SBATCH -e m2-19-4-s.e%j                    # Name of stderr error file (%j corresponds to the job id)
 #SBATCH -p gtx                            # Queue (partition) name
 #SBATCH -N 1                              # Total # of nodes (must be 1 for serial)
 #SBATCH -n 1                              # Total # of mpi tasks (should be 1 for serial)
@@ -25,7 +25,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/apps/cuda/11.3/lib64
 source $WORK/virtualenv/bin/activate
 cd $WORK/ECE361E/Project/Project_files
 mkdir "ckpt"
-python $WORK/ECE361E/Project/Project_files/main_pt.py --batch_size=128 --epochs=100 > $WORK/ECE361E/Project/Project_files/mnet1.txt
+python $WORK/ECE361E/Project/Project_files/main_pt.py --batch_size=128 --epochs=100 > $WORK/ECE361E/Project/Project_files/mnet2_19_4_stem.txt
 
 
 # Launch code...
