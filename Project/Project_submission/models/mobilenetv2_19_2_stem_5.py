@@ -58,9 +58,9 @@ class MobileNetv2(nn.Module):
     #(out_channels, stride, expansion)
     #Transcribed from Table 2 of Mobilenetv2 paper
     cfg = [
-        (12,2,1),
-        (12,2,2),
-        (12,2,2),
+        (11,2,1),
+        (11,2,2),
+        (11,2,2),
         # (32,2,5),
         # (32,1,6), 
         # (32,1,6),
@@ -85,7 +85,7 @@ class MobileNetv2(nn.Module):
         # self.conv2 = nn.Conv2d(320, 1280, kernel_size=1, stride=1, padding=0, bias=False)
         self.avgpool = nn.AvgPool2d((2,2))
         # self.conv3 = nn.Conv2d(1280, 1280, kernel_size=1, stride=1, padding=0, bias=False)
-        self.linear = nn.Linear(12*4, num_classes)
+        self.linear = nn.Linear(11*4, num_classes)
     
     def _make_layers(self, in_planes):
         layers = []

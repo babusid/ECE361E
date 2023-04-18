@@ -1,0 +1,82 @@
+import telnetlib as tel
+import time
+import argparse
+import gpiozero
+import numpy as np
+
+
+def get_telnet_power(telnet_connection, last_power):
+    """
+    Read power values using telnet.
+    """
+    # Get the latest data available from the telnet connection without blocking
+    tel_dat = str(telnet_connection.read_very_eager())
+    # print('telnet reading:', tel_dat)
+    # Find the latest power measurement in the data
+    idx = tel_dat.rfind('\n')
+    idx2 = tel_dat[:idx].rfind('\n')
+    idx2 = idx2 if idx2 != -1 else 0
+    ln = tel_dat[idx2:idx].strip().split(',')
+    if len(ln) < 2:
+        total_power = last_power
+    else:
+        total_power = float(ln[-2])
+    return total_power
+
+
+def get_temps():
+    cpu_temp = gpiozero.CPUTemperature().temperature
+    return cpu_temp
+
+
+# solution - writing the temperature, power and cpu usage readings in a csv file 
+class What_Temperature_Do_I_Preheat_My_Oven_To():
+
+    def __init__(self, filename, msg_queue):
+        self.fname = filename
+        self.q = msg_queue
+
+    def run(self):
+
+        # with open(self.fname, 'w+') as csv_file:
+            # csv_file.write(f"Time stamp,Power,avg_temp\n")
+        # measurement   
+        telnet_connection = tel.Telnet("192.168.4.1")
+        start_time = 0
+
+        total_power=0        
+        power_measurements = np.empty((0,2))
+        profiling_time = 0
+        num_measurements = 0
+
+        while self.q.empty():
+            last_time = time.time()
+            if(start_time == 0):
+                start_time = time.time()
+
+            # system power
+            total_power = get_telnet_power(telnet_connection, total_power)
+            # print('telnet power : ', total_power)
+
+            # cpu temperature
+            cpu_temp = get_temps()
+            # print('cpu temp : ', cpu_temp)
+
+            power_measurements = np.append(power_measurements,np.array([(time.time(), total_power)]),axis=0) #add timestamped power measurement
+            num_measurements += 1
+
+            # # writing the readings to the csv file 
+            # time_stamp = last_time
+            # csv_file.write(f"{time_stamp}, {total_power}, {cpu_temp}\n")
+            elapsed = time.time() - last_time
+            DELAY = 0.2
+            time.sleep(max(0.,DELAY-elapsed))
+            
+        end_time = time.time()
+        profiling_time = end_time - start_time
+        retdict = {
+            "num_measurements" : num_measurements,
+            "power_measurements" : power_measurements,
+            "profiling_time": profiling_time, 
+        }
+        self.q.put(retdict)
