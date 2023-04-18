@@ -1,11 +1,11 @@
-Test Accuracy: 0.7021
-Test Time: 15.1577421824 s
-Average Latency: 1.51577421824 ms
-Average Baseline Memory: 95.7564685191 mebi
-Average Runtime Memory: 111.150553309 mebi
-Maximum Runtime Memory: 115.666666667 mebi
-Max Runtime Memory (Subtracting baseline): 19.9101981479
-Maximum Power: 6.368 W
-Total Energy: 219.228250751 J
-Average Energy per image: 21.9228250751 mJ
+Averaged Test Accuracy: 0.7021
+Averaged Test Time: 15.1577421824 s
+Averaged Latency: 1.51577421824 ms
+Averaged Baseline Memory: 95.7564685191 mebi
+Averaged Average Runtime Memory: 111.150553309 mebi
+Averaged Maximum Runtime Memory: 115.666666667 mebi
+Averaged Max Runtime Memory (Subtracting averaged baseline): 19.9101981479
+Averaged Maximum Power: 6.368 W
+Averaged Total Energy: 219.228250751 J
+Averaged Energy per image: 21.9228250751 mJ
 Figure of Merit: 21139.2620087
