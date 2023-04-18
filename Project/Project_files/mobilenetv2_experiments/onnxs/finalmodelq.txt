@@ -1,0 +1,13 @@
+['/work/09265/babusid1/maverick2/ECE361E/Project/Project_files/mobilenetv2_experiments/onnxs/mobilenetv2_19_2_stem_5.onnx']
+/work/09265/babusid1/maverick2/ECE361E/Project/Project_files/mobilenetv2_experiments/onnxs/mobilenetv2_19_2_stem_5.onnx /work/09265/babusid1/maverick2/ECE361E/Project/Project_files/mobilenetv2_experiments/onnxs/mobilenetv2_19_2_stem_5_infer.onnx /work/09265/babusid1/maverick2/ECE361E/Project/Project_files/mobilenetv2_experiments/onnxs/mobilenetv2_19_2_stem_5_int8.onnx
+Files already downloaded and verified
+100
+200
+300
+400
+500
+600
+700
+800
+900
+1000
