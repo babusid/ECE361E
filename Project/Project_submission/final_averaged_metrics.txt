@@ -4,7 +4,6 @@ Average Latency: 1.5079861402511596 ms
 Average Baseline Memory: 95.07137331322268 mebi
 Average Runtime Memory: 110.80302272690614 mebi
 Maximum Runtime Memory: 115.0 mebi
-Used Memory: 4.19697727309386 mebi
 Maximum Power: 6.375666666666667 W
 Total Energy: 221.35936410840353 J
 Average Energy: 22.135936410840355 mJ
