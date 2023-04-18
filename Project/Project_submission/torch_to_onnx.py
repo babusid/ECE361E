@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 import os
-from models.mobilenetv2_19_2_stem import MobileNetv2 as MobileNetv2_19_2_stem
+from models.mobilenetv2_19_2_stem_5 import MobileNetv2 as MobileNetv2_19_2_stem_5
 
 CHOSEN_EPOCH = 98
 
-model = MobileNetv2_19_2_stem()
-ckpt = torch.load(f'ckpt/mobilenetv2_19_2_stem/mobilenetv2_19_2_stem_{CHOSEN_EPOCH}.pt')
+model = MobileNetv2_19_2_stem_5()
+ckpt = torch.load(f'ckpt/mobilenetv2_19_2_stem_2_5_349.pt', map_location=torch.device('cpu'))
 model.load_state_dict(ckpt)
 
 os.makedirs("onnxs", exist_ok=True)

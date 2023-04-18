@@ -6,10 +6,11 @@ from PIL import Image
 import argparse
 import time
 import multiprocessing as mp
-from multiprocessing import Process
+from multiprocessing import Process, Value
 import subprocess
 import get_power_temp_mc1 as mc1
 import get_power_temp_rpi as rpi
+import numpy as np
 
 #path to this script
 CWD = os.path.dirname(os.path.abspath(__file__)) 
@@ -50,19 +51,23 @@ std = np.array((0.2023, 0.1994, 0.2010))
 # Label names for CIFAR10 Dataset
 label_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
+avg_runtime_mem = Value('d')
+max_runtime_mem = Value('d')
+num_runtime_measurements = Value('d')
+
 def mcheck():
-
-    logfile = os.path.join(CWD, f'test_RAM_{args.model}.txt')
-    os.makedirs(os.path.dirname(logfile), exist_ok=True)
-
+    # logfile = os.path.join(CWD, f'test_RAM_{args.model}.txt')
+    # os.makedirs(os.path.dirname(logfile), exist_ok=True)
     while True:
-        with open(logfile, 'a') as f:
-            try:
-                output = subprocess.check_output('free -m'.split(), stderr=subprocess.STDOUT).decode('utf-8')
-            except:
-                f.write('poop fart')
-                break
-            f.write(output)
+        output = subprocess.check_output('free -m'.split(), stderr=subprocess.STDOUT).decode('utf-8')
+        output = output.split('\n')
+        mem = output[1]
+        memu = " ".join(mem.split()).split(" ")[2]
+        memu = int(memu)
+        avg_runtime_mem.value += memu
+        num_runtime_measurements.value += 1
+        if(memu > max_runtime_mem.value):
+            max_runtime_mem.value = memu
         time.sleep(0.1)
 
 def start_measuring(filename, device, msg_queue):
@@ -74,13 +79,30 @@ correct = 0
 total = 0
 test_time = 0
 
-# stop_measurement = mp.Queue()
-# filename = args.model + '_power_temperature.csv'
-# memcheck_process = Process(target = mcheck)
-# measurement_process = mp.Process(target=start_measuring, args=(filename, args.target, stop_measurement))
-# memcheck_process.start()
-# measurement_process.start()
-# time.sleep(10)  # idle memory and power usage
+# run for 10 seconds
+# calculating memory baseline here
+avgBaselineMem = 0
+numMeasurements = 0
+start = time.time()
+end = time.time() + 10
+while(time.time() < end):
+    output = subprocess.check_output('free -m'.split(), stderr=subprocess.STDOUT).decode('utf-8')
+    numMeasurements+=1
+    output = output.split('\n')
+    mem = output[1]
+    memu = " ".join(mem.split()).split(" ")[2]
+    memu = int(memu)
+    avgBaselineMem += memu
+avgBaselineMem /= numMeasurements
+
+stop_measurement = mp.Queue()
+filename = args.model + '_power_temperature.csv'
+memcheck_process = Process(target = mcheck)
+measurement_process = mp.Process(target=start_measuring, args=(filename, args.target, stop_measurement))
+memcheck_process.start()
+measurement_process.start()
+
+# time.sleep(10)
 
 for filename in tqdm(os.listdir(os.path.join(CWD, "test_deployment"))):
     # Take each image, one by one, and make inference
@@ -116,13 +138,50 @@ for filename in tqdm(os.listdir(os.path.join(CWD, "test_deployment"))):
             correct += 1 
         total += 1
 
-# stop_measurement.put('please stop running ♥‿♥')
-# measurement_process.join()
-# memcheck_process.terminate()
-# memcheck_process.join()
+stop_measurement.put('please stop running ♥‿♥')
+
+retdict = ""
+# while(type(retdict) != type({})):
+measurement_process.join()
+retdict = stop_measurement.get()
+retdict = stop_measurement.get()
+measurement_process.terminate()
+memcheck_process.terminate()
+memcheck_process.join()
 
 with open(f'{args.model}_testmetrics.txt', 'w') as f:
-    f.write(f"Test Accuracy: {correct/total} ")
+    # test metrics
+    f.write(f"Test Accuracy: {correct/total} \n")
     f.write(f"Test Time: {test_time} seconds\n")
+    f.write(f"Avg Latency: {(test_time/total)*1000} ms\n")
+    # memory metrics
+    f.write(f"Avg Baseline Memory: {avgBaselineMem} mebi\n")
+    f.write(f"Avg runtime memory: {avg_runtime_mem.value/num_runtime_measurements.value} mebi\n")
+    f.write(f"Max runtime memory: {max_runtime_mem.value} mebi\n")
+    f.write(f"Used Memory: {max_runtime_mem.value - (avg_runtime_mem.value/num_runtime_measurements.value)}\n")
+    # power measurements
+    power_measurements = retdict['power_measurements']
+    time_deltas = np.diff(power_measurements[:,0])
+    time_deltas = np.insert(time_deltas,0,0.0,axis=0)
+
+    measurements = power_measurements[:,1]
+    measurements = measurements - np.min(measurements)
+
+    max_power = np.max(measurements,axis=0)
+    energy = measurements*time_deltas
+    netenergy = np.sum(energy,axis=0)
+    f.write(f'Max Power (W): {max_power}\n')
+    f.write(f'Total Energy (J): {netenergy} \n')
+    f.write(f'Average Energy (mJ): {(netenergy/total)*1000}\n')
+
+    #merit factor
+    avg_latency_s = (test_time/total)
+    testacc = correct/total 
+    fom = testacc / (avg_latency_s*netenergy) 
+    
+    f.write(f'FOM: {fom}')
+    f.write('\n')
+
+    
 
 

@@ -7,7 +7,7 @@ import time
 import numpy as np
 import os
 
-from models.mobilenetv2_19_2_stem import MobileNetv2
+from models.mobilenetv2_19_2_stem_5 import MobileNetv2
 from set_seed import set_random_seed
 
 # Argument parser
@@ -47,7 +47,7 @@ model = None
 model_str = ""
 
 model = MobileNetv2()
-model_str = "mobilenetv2_19_2_stem"
+model_str = "mobilenetv2_19_2_stem_5"
 
 # Put the model on the GPU
 device = torch.device('cuda')
