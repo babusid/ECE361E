@@ -1,0 +1,11 @@
+Test Accuracy: 0.7021 
+Test Time: 15.276924133300781 seconds
+Avg Latency: 1.527692413330078 ms
+Avg Baseline Memory: 97.2720156555773 mebi
+Avg runtime memory: 112.47983870967742 mebi
+Max runtime memory: 117.0 mebi
+Max runtime memory (subtracting baseline): 19.727984344422694
+Max Power (W): 6.336
+Total Energy (J): 217.59069462013247 
+Average Energy (mJ): 21.759069462013247
+
