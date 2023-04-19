@@ -8,4 +8,7 @@ Averaged Max Runtime Memory (Subtracting averaged baseline): 19.9101981479
 Averaged Maximum Power: 6.368 W
 Averaged Total Energy: 219.228250751 J
 Averaged Energy per image: 21.9228250751 mJ
-Figure of Merit: 21139.2620087
+Figure of Merit: 21128.4646208
+
+NOTE: The FOM calculated here is based on the non-truncated measurements that were taken from the Pi. 
+The FOM on the slide is based on the measurements at the desired level of rounding. As such, they may not match exactly, but should be very close.
